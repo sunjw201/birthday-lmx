@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Happy Birthday, LMX 🎂</title>
+  <style>
+    :root {
+      --pink: #ff6b9d;
+      --gold: #ffd700;
+      --rose: #fff0f5;
+      --dark: #1a1a2e;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      background: var(--dark);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+      color: white;
+    }
+
+    /* 🌸 背景渐变 */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 0%, #2a1a3a 0%, #1a1a2e 60%, #0d0d1a 100%);
+      z-index: -2;
+    }
+
+    /* 🎵 音乐播放器 */
+    .music-control {
+      position: fixed;
+      top: 1.5rem;
+      right: 1.5rem;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 107, 157, 0.35);
+      border-radius: 50px;
+      padding: 0.6rem 1rem 0.6rem 0.6rem;
+      backdrop-filter: blur(12px);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      user-select: none;
+    }
+
+    .music-control:hover {
+      background: rgba(255, 107, 157, 0.18);
+      border-color: rgba(255, 107, 157, 0.6);
+      transform: scale(1.04);
+    }
+
+    .music-icon-wrap {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--pink), var(--gold));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: transform 0.3s;
+    }
+
+    .music-control.playing .music-icon-wrap {
+      animation: musicPulse 1.4s ease-in-out infinite;
+    }
+
+    @keyframes musicPulse {
+      0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 107, 157, 0.4); }
+      50% { transform: scale(1.1); box-shadow: 0 0 0 8px rgba(255, 107, 157, 0); }
+    }
+
+    .music-icon {
+      font-size: 16px;
+      color: white;
+      line-height: 1;
+    }
+
+    .music-info {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+
+    .music-title {
+      font-size: 0.75rem;
+      color: rgba(255, 255, 255, 0.9);
+      font-weight: 500;
+      max-width: 130px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .music-status {
+      font-size: 0.65rem;
+      color: rgba(255, 255, 255, 0.4);
+      letter-spacing: 1px;
+      transition: color 0.3s;
+    }
+
+    .music-control.playing .music-status {
+      color: var(--pink);
+    }
+
+    /* 🎵 进度条 */
+    .music-progress {
+      position: absolute;
+      bottom: -4px;
+      left: 6px;
+      right: 6px;
+      height: 3px;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .music-progress-bar {
+      height: 100%;
+      background: linear-gradient(to right, var(--pink), var(--gold));
+      border-radius: 2px;
+      width: 0%;
+      transition: width 0.5s linear;
+    }
+
+    .music-waves {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      height: 14px;
+    }
+
+    .wave-bar {
+      width: 3px;
+      border-radius: 2px;
+      background: rgba(255, 255, 255, 0.6);
+      animation: wave 1s ease-in-out infinite;
+    }
+
+    .music-control:not(.playing) .wave-bar {
+      animation: none;
+      height: 4px !important;
+    }
+
+    .wave-bar:nth-child(1) { animation-delay: 0s; }
+    .wave-bar:nth-child(2) { animation-delay: 0.15s; }
+    .wave-bar:nth-child(3) { animation-delay: 0.3s; }
+
+    @keyframes wave {
+      0%, 100% { height: 4px; }
+      50% { height: 14px; }
+    }
+
+    /* 🌙 音乐提示 */
+    .music-hint {
+      position: fixed;
+      bottom: 5rem;
+      right: 1.5rem;
+      background: rgba(255, 107, 157, 0.2);
+      border: 1px solid rgba(255, 107, 157, 0.4);
+      border-radius: 12px;
+      padding: 0.6rem 1rem;
+      font-size: 0.75rem;
+      color: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(10px);
+      animation: hintPop 0.5s ease forwards, hintFade 0.5s 3s ease forwards;
+      z-index: 99;
+    }
+
+    @keyframes hintPop {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes hintFade {
+      to { opacity: 0; pointer-events: none; }
+    }
+
+    /* ✨ 粒子容器 */
+    .particles {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    /* 💫 星星 */
+    .star {
+      position: absolute;
+      width: 3px;
+      height: 3px;
+      background: white;
+      border-radius: 50%;
+      animation: twinkle 2s ease-in-out infinite;
+    }
+
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.2; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.5); }
+    }
+
+    /* ❤️ 心形飘落 */
+    .heart {
+      position: absolute;
+      font-size: 20px;
+      animation: fall linear infinite;
+      opacity: 0.7;
+      top: -30px;
+    }
+
+    @keyframes fall {
+      0% { transform: translateY(-20px) rotate(0deg); opacity: 0.8; }
+      100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+    }
+
+    /* 🎀 主内容 */
+    .container {
+      text-align: center;
+      padding: 2rem;
+      z-index: 1;
+    }
+
+    .cake-emoji {
+      font-size: 80px;
+      animation: bounce 2s ease-in-out infinite;
+      display: block;
+      margin-bottom: 1rem;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-20px); }
+    }
+
+    h1 {
+      font-size: clamp(2.5rem, 8vw, 5rem);
+      background: linear-gradient(135deg, var(--pink), var(--gold), var(--pink));
+      background-size: 200% 200%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: shimmer 3s ease-in-out infinite;
+      margin-bottom: 0.5rem;
+    }
+
+    @keyframes shimmer {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    .date {
+      font-size: 1.2rem;
+      color: rgba(255, 255, 255, 0.5);
+      letter-spacing: 4px;
+      margin-bottom: 3rem;
+    }
+
+    .divider {
+      width: 120px;
+      height: 2px;
+      background: linear-gradient(to right, transparent, var(--pink), var(--gold), transparent);
+      margin: 0 auto 3rem;
+    }
+
+    /* ⏰ 倒计时 */
+    .countdown-label {
+      font-size: 1.1rem;
+      color: rgba(255, 255, 255, 0.6);
+      margin-bottom: 1rem;
+      letter-spacing: 2px;
+    }
+
+    .countdown {
+      display: flex;
+      gap: 1.5rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .countdown-item {
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(255, 107, 157, 0.3);
+      border-radius: 16px;
+      padding: 1.2rem 1.5rem;
+      min-width: 90px;
+      backdrop-filter: blur(10px);
+      transition: transform 0.3s;
+    }
+
+    .countdown-item:hover { transform: translateY(-4px); }
+
+    .countdown-num {
+      font-size: 2.5rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #fff, var(--pink));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      display: block;
+    }
+
+    .countdown-unit {
+      font-size: 0.8rem;
+      color: rgba(255, 255, 255, 0.5);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-top: 0.3rem;
+      display: block;
+    }
+
+    /* 🎉 生日祝福 */
+    .birthday-active {
+      display: none;
+    }
+
+    body.is-birthday .countdown { display: none; }
+    body.is-birthday .countdown-label { display: none; }
+    body.is-birthday .birthday-active { display: block; }
+
+    .wish-title {
+      font-size: clamp(1.8rem, 5vw, 3rem);
+      color: var(--gold);
+      margin-bottom: 1rem;
+      animation: glow 2s ease-in-out infinite;
+    }
+
+    @keyframes glow {
+      0%, 100% { text-shadow: 0 0 10px rgba(255, 215, 0, 0.5); }
+      50% { text-shadow: 0 0 30px rgba(255, 215, 0, 0.9), 0 0 60px rgba(255, 107, 157, 0.5); }
+    }
+
+    .wish-text {
+      font-size: 1.1rem;
+      line-height: 2;
+      color: rgba(255, 255, 255, 0.8);
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    /* 🎈 祝福语轮播 */
+    .wishes-carousel {
+      margin-top: 2.5rem;
+    }
+
+    .wish-item {
+      background: rgba(255, 107, 157, 0.15);
+      border: 1px solid rgba(255, 107, 157, 0.3);
+      border-radius: 12px;
+      padding: 1rem 2rem;
+      margin: 0.5rem 0;
+      font-size: 1rem;
+      color: rgba(255, 255, 255, 0.9);
+      animation: fadeInUp 0.6s ease forwards;
+      opacity: 0;
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* 🎇 彩带 */
+    .confetti {
+      position: fixed;
+      top: -10px;
+      font-size: 1.2rem;
+      animation: confettiFall linear infinite;
+      z-index: 2;
+    }
+
+    @keyframes confettiFall {
+      0% { transform: translateY(-20px) rotate(0deg); }
+      100% { transform: translateY(110vh) rotate(720deg); }
+    }
+
+    /* 🌟 底部署名 */
+    .footer {
+      position: fixed;
+      bottom: 1.5rem;
+      font-size: 0.75rem;
+      color: rgba(255, 255, 255, 0.2);
+      letter-spacing: 1px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="particles" id="particles"></div>
+
+<!-- 🎵 音乐播放器 -->
+<div class="music-control" id="musicControl" title="点击播放/暂停背景音乐">
+  <div class="music-icon-wrap">
+    <span class="music-icon" id="musicIcon">🎵</span>
+  </div>
+  <div class="music-info">
+    <span class="music-title">Happy Birthday</span>
+    <span class="music-status" id="musicStatus">点击播放</span>
+  </div>
+  <div class="music-waves" id="musicWaves">
+    <div class="wave-bar" style="height:6px"></div>
+    <div class="wave-bar" style="height:10px"></div>
+    <div class="wave-bar" style="height:8px"></div>
+  </div>
+  <div class="music-progress">
+    <div class="music-progress-bar" id="musicProgress"></div>
+  </div>
+</div>
+
+<!-- 🌙 音乐提示 -->
+<div class="music-hint" id="musicHint">
+  🎶 点击右上角播放背景音乐
+</div>
+
+<!-- 🔊 背景音乐（可替换为你的音乐URL） -->
+<!--
+  替换音乐方法：
+  1. 将音乐文件上传到 GitHub 仓库或使用网络音乐URL
+  2. 修改下面 src 的值为你的音乐链接
+  3. 推荐格式：MP3，文件小于 10MB 效果更好
+-->
+<audio id="bgMusic" loop preload="none">
+  <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+</audio>
+
+<div class="container">
+  <div class="birthday-active">
+    <h2 class="wish-title">🎊 生日快乐！🎊</h2>
+    <p class="wish-text">
+      亲爱的小明，今天是属于你的特别日子<br>
+      愿你所有的期待都能如愿<br>
+      愿你被这世界温柔以待<br>
+      愿你的每一天都闪闪发光 ✨
+    </p>
+  </div>
+
+  <div id="birthday-normal">
+    <span class="cake-emoji">🎂</span>
+    <h1>Happy Birthday, LMX</h1>
+    <p class="date">11 月 09 日</p>
+    <div class="divider"></div>
+
+    <p class="countdown-label">⏳ 距离生日还有</p>
+    <div class="countdown" id="countdown">
+      <div class="countdown-item"><span class="countdown-num" id="d">--</span><span class="countdown-unit">天</span></div>
+      <div class="countdown-item"><span class="countdown-num" id="h">--</span><span class="countdown-unit">时</span></div>
+      <div class="countdown-item"><span class="countdown-num" id="m">--</span><span class="countdown-unit">分</span></div>
+      <div class="countdown-item"><span class="countdown-num" id="s">--</span><span class="countdown-unit">秒</span></div>
+    </div>
+  </div>
+
+  <div class="wishes-carousel" id="wishes">
+    <div class="wish-item" style="animation-delay: 0.2s">🌸 愿你眼里全是阳光，笑里全是坦荡</div>
+    <div class="wish-item" style="animation-delay: 0.8s">⭐ 前路浩浩荡荡，万事皆可期待</div>
+    <div class="wish-item" style="animation-delay: 1.4s">🌙 所求皆如愿，所行皆化坦途</div>
+    <div class="wish-item" style="animation-delay: 2s">🎁 永远保持热爱，奔赴下一场山海</div>
+    <div class="wish-item" style="animation-delay: 2.6s">💖 愿你被岁月温柔相待</div>
+  </div>
+</div>
+
+<p class="footer">Made with ❤️ for LMX</p>
+
+<script>
+  // 🎵 背景音乐控制
+  const audio = document.getElementById('bgMusic');
+  const control = document.getElementById('musicControl');
+  const icon = document.getElementById('musicIcon');
+  const status = document.getElementById('musicStatus');
+  const progress = document.getElementById('musicProgress');
+  const hint = document.getElementById('musicHint');
+
+  let isPlaying = false;
+
+  // 隐藏提示
+  setTimeout(() => { if (hint) hint.remove(); }, 4000);
+
+  control.addEventListener('click', () => {
+    if (isPlaying) {
+      audio.pause();
+      control.classList.remove('playing');
+      icon.textContent = '🎵';
+      status.textContent = '已暂停';
+      isPlaying = false;
+    } else {
+      const playPromise = audio.play();
+      if (playPromise !== undefined) {
+        playPromise.then(() => {
+          control.classList.add('playing');
+          icon.textContent = '🎶';
+          status.textContent = '播放中';
+          isPlaying = true;
+        }).catch(() => {
+          status.textContent = '点击重试';
+        });
+      }
+    }
+  });
+
+  // 更新进度条
+  audio.addEventListener('timeupdate', () => {
+    if (audio.duration) {
+      const pct = (audio.currentTime / audio.duration) * 100;
+      progress.style.width = pct + '%';
+    }
+  });
+
+  audio.addEventListener('ended', () => {
+    progress.style.width = '0%';
+  });
+
+  // ✨ 创建背景星星
+  const particles = document.getElementById('particles');
+  for (let i = 0; i < 80; i++) {
+    const star = document.createElement('div');
+    star.className = 'star';
+    star.style.left = Math.random() * 100 + '%';
+    star.style.top = Math.random() * 100 + '%';
+    star.style.animationDelay = Math.random() * 3 + 's';
+    star.style.animationDuration = (1.5 + Math.random() * 2) + 's';
+    particles.appendChild(star);
+  }
+
+  // ❤️ 创建飘落的心
+  const HEARTS = ['💕', '💗', '💖', '💝', '🌹', '✨', '⭐'];
+  function createHeart() {
+    const heart = document.createElement('div');
+    heart.className = 'heart';
+    heart.textContent = HEARTS[Math.floor(Math.random() * HEARTS.length)];
+    heart.style.left = Math.random() * 100 + '%';
+    heart.style.animationDuration = (4 + Math.random() * 5) + 's';
+    heart.style.fontSize = (14 + Math.random() * 16) + 'px';
+    heart.style.opacity = 0.3 + Math.random() * 0.5;
+    document.body.appendChild(heart);
+    setTimeout(() => heart.remove(), 10000);
+  }
+  setInterval(createHeart, 600);
+
+  // 🎇 生日当天的彩带
+  function createConfetti() {
+    const c = document.createElement('div');
+    c.className = 'confetti';
+    c.textContent = ['🎊', '🎉', '🎈', '✨', '🌟', '💫', '🎁', '🎂'][Math.floor(Math.random() * 8)];
+    c.style.left = Math.random() * 100 + '%';
+    c.style.animationDuration = (3 + Math.random() * 4) + 's';
+    document.body.appendChild(c);
+    setTimeout(() => c.remove(), 8000);
+  }
+
+  // ⏰ 倒计时
+  function getNextBirthday() {
+    const now = new Date();
+    let year = now.getFullYear();
+    const birthday = new Date(year, 10, 9); // 11月9日，月份从0开始
+    if (now > birthday) birthday.setFullYear(year + 1);
+    return birthday;
+  }
+
+  function updateCountdown() {
+    const target = getNextBirthday();
+    const now = new Date();
+    const diff = target - now;
+
+    const isBirthday = now.getMonth() === 10 && now.getDate() === 9;
+
+    if (isBirthday) {
+      document.body.classList.add('is-birthday');
+      for (let i = 0; i < 3; i++) setTimeout(createConfetti, i * 300);
+      setInterval(() => createConfetti(), 400);
+      return;
+    }
+
+    const d = Math.floor(diff / 86400000);
+    const h = Math.floor((diff % 86400000) / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+
+    document.getElementById('d').textContent = d;
+    document.getElementById('h').textContent = h;
+    document.getElementById('m').textContent = m;
+    document.getElementById('s').textContent = s;
+  }
+
+  updateCountdown();
+  setInterval(updateCountdown, 1000);
+</script>
+</body>
+</html>
