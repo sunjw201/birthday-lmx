@@ -531,7 +531,7 @@
   </div>
 
   <div class="wishes-carousel" id="wishes">
-    <div class="wish-item" style="animation-delay: 0.2s">🎵 歌词来源：周杰伦 🎵</div>
+    <div class="wish-item" style="animation-delay: 0.2s">🎵 每一条 都是我想对你说的话 🎵</div>
   </div>
 </div>
 
@@ -640,51 +640,51 @@
   }
   setInterval(createHeart, 600);
 
-  // 🎤 飘动歌词
+  // 🎤 飘动歌词 — 全是夸你、爱你、祝福你
   const LYRICS = [
-    { text: '漂亮的让我面红的可爱女人', song: '可爱女人' },
-    { text: '温柔的让我心疼的可爱女人', song: '可爱女人' },
-    { text: '透明的让我感动的可爱女人', song: '可爱女人' },
-    { text: '坏坏的让我疯狂的可爱女人', song: '可爱女人' },
-    { text: '载着你仿佛载着阳光 不管到哪里都是晴天', song: '星晴' },
-    { text: '手牵手 一步两步三步四步 望着天', song: '星晴' },
-    { text: '看星星一颗两颗三颗四颗 连成线', song: '星晴' },
-    { text: '我想就这样牵着你的手不放开', song: '简单爱' },
-    { text: '爱能不能够永远单纯没有悲哀', song: '简单爱' },
-    { text: '我想带你 回我的外婆家', song: '简单爱' },
-    { text: '一起看着日落 一直到我们都睡着', song: '简单爱' },
-    { text: '窗外的麻雀 在电线杆上站成一行', song: '七里香' },
-    { text: '那温暖的阳光 像刚摘的鲜艳草莓', song: '七里香' },
-    { text: '你是我唯一想要的了解', song: '七里香' },
-    { text: '我受够等待你所谓的安排', song: '龙卷风' },
-    { text: '爱情来得太快就像龙卷风', song: '龙卷风' },
-    { text: '离不开暴风圈来不及逃', song: '龙卷风' },
-    { text: '听妈妈的话 别让她受伤', song: '听妈妈的话' },
-    { text: '想快快长大 才能保护她', song: '听妈妈的话' },
-    { text: '美丽的白发 幸福中发芽', song: '听妈妈的话' },
-    { text: '天使的魔法 温暖中慈祥', song: '听妈妈的话' },
-    { text: '天青色等烟雨 而我在等你', song: '青花瓷' },
-    { text: '炊烟袅袅升起 隔江千万里', song: '青花瓷' },
-    { text: '你发如雪 凄美了离别', song: '发如雪' },
-    { text: '我等待苍老了谁', song: '发如雪' },
-    { text: '海鸟和鱼相爱 只是一场意外', song: '珊瑚海' },
-    { text: '转身离开 明明说不明白', song: '珊瑚海' },
-    { text: '但偏偏 偏偏 让我遇见你', song: '园游会' },
-    { text: '你是我藏在心里的感动', song: '园游会' },
-    { text: '甜甜的 嘴角 甜甜的说话', song: '园游会' },
-    { text: '祝 LMX 生日快乐 天天开心', song: '💖' },
-    { text: '愿你眼里有光 心中有爱', song: '💖' },
+    '你是世界上最可爱的人',
+    '愿你被岁月温柔以待',
+    '你笑起来真好看',
+    '愿你眼里有光 心中有爱',
+    '你是我见过最美好的存在',
+    '愿你的每一天都闪闪发光',
+    '你值得世间所有的美好',
+    '生日快乐 我最珍贵的你',
+    '愿你永远被幸福包围',
+    '有你在的每一天都是礼物',
+    '你是人间四月天',
+    '愿你永远笑靥如花',
+    '你让平凡的日子发光',
+    '愿你永远被爱包围',
+    '遇见你是我的幸运',
+    '愿你心想事成 万事胜意',
+    '你是独一无二的美好',
+    '愿你眼里永远有星星',
+    '你让世界变得温柔',
+    '生日快乐 愿所有美好如期而至',
+    '你是我心中的光',
+    '愿你永远做快乐的小孩',
+    '你值得所有的掌声与爱',
+    '愿你被这个世界温柔相待',
+    '你是我最想守护的人',
+    '愿你岁岁平安 天天开心',
+    '你让每一天都值得期待',
+    '愿你永远保持热爱奔赴山海',
+    '你是我珍藏的宝贝',
+    '愿你活成自己想要的样子',
+    '你让我的世界有了颜色',
+    '生日快乐 LMX',
   ];
 
   let lyricIndex = 0;
 
   function createLyric() {
-    const lyric = LYRICS[lyricIndex % LYRICS.length];
+    const text = LYRICS[lyricIndex % LYRICS.length];
     lyricIndex++;
 
     const el = document.createElement('div');
     el.className = 'lyric';
-    el.textContent = '♪ ' + lyric.text;
+    el.textContent = '♪ ' + text;
     el.style.top = (15 + Math.random() * 65) + '%';
 
     const duration = 12 + Math.random() * 8;
