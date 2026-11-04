@@ -488,7 +488,7 @@
 
     .candle-wrap {
       position: absolute;
-      top: -30px;
+      top: -10px;  /* 下移，更容易被看到 */
       left: 50%;
       transform: translateX(-50%);
       display: flex;
@@ -498,7 +498,7 @@
     }
 
     .candle {
-      font-size: 36px;
+      font-size: 48px;  /* 放大蜡烛 */
       position: relative;
       display: inline-block;
       transition: transform 0.2s;
@@ -506,9 +506,9 @@
 
     .flame {
       display: none;
-      font-size: 22px;
+      font-size: 30px;  /* 放大火焰 */
       position: absolute;
-      top: -20px;
+      top: -26px;
       left: 50%;
       transform: translateX(-50%);
       transform-origin: bottom center;
@@ -529,6 +529,181 @@
     @keyframes candleShake {
       0% { transform: rotate(-2deg); }
       100% { transform: rotate(2deg); }
+    }
+
+    /* 🎁 礼物盒 */
+    .gift-section {
+      margin-top: 1.5rem;
+      display: flex;
+      justify-content: center;
+    }
+
+    .gift-box {
+      cursor: pointer;
+      display: inline-block;
+      font-size: 64px;
+      transition: transform 0.3s ease;
+      filter: drop-shadow(0 8px 16px rgba(255, 107, 157, 0.3));
+      user-select: none;
+    }
+
+    .gift-box:hover {
+      transform: scale(1.1) rotate(-3deg);
+    }
+
+    .gift-box:active {
+      transform: scale(0.95);
+    }
+
+    .gift-hint {
+      text-align: center;
+      font-size: 0.75rem;
+      color: rgba(255, 255, 255, 0.4);
+      margin-top: 0.5rem;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.4; }
+      50% { opacity: 0.8; }
+    }
+
+    /* 💌 信件弹窗 */
+    .letter-modal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      background: linear-gradient(145deg, #fffef5, #fff9e6);
+      border-radius: 20px;
+      padding: 2rem;
+      z-index: 205;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4), inset 0 0 60px rgba(255, 220, 180, 0.2);
+      width: min(520px, 92vw);
+      max-height: 85vh;
+      overflow-y: auto;
+      transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+      font-family: 'STKaiti', 'KaiTi', '楷体', '楷体_GB2312', serif;
+    }
+
+    .letter-modal.show {
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    /* 信纸背景纹理 */
+    .letter-modal::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 20px;
+      background-image:
+        repeating-linear-gradient(
+          transparent,
+          transparent 31px,
+          rgba(200, 180, 150, 0.2) 31px,
+          rgba(200, 180, 150, 0.2) 32px
+        );
+      pointer-events: none;
+    }
+
+    .letter-header {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .letter-emoji {
+      font-size: 2.5rem;
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+
+    .letter-title {
+      font-size: 1.5rem;
+      color: #8B4513;
+      font-weight: 700;
+      font-family: 'STKaiti', 'KaiTi', '楷体', serif;
+    }
+
+    .letter-date {
+      font-size: 0.8rem;
+      color: #c4a882;
+      margin-top: 0.3rem;
+    }
+
+    .letter-section {
+      margin-bottom: 1.2rem;
+    }
+
+    .letter-section-title {
+      font-size: 0.9rem;
+      color: #8B4513;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      padding-left: 0.5rem;
+      border-left: 3px solid #ffb347;
+      font-family: 'STKaiti', 'KaiTi', '楷体', serif;
+    }
+
+    .letter-textarea {
+      width: 100%;
+      min-height: 80px;
+      border: 1.5px solid #e8d4b8;
+      border-radius: 10px;
+      padding: 0.7rem 1rem;
+      font-size: 0.95rem;
+      color: #5a3a1a;
+      background: rgba(255, 250, 240, 0.8);
+      resize: vertical;
+      outline: none;
+      font-family: 'STKaiti', 'KaiTi', '楷体', '楷体_GB2312', serif;
+      line-height: 1.8;
+      box-sizing: border-box;
+      transition: border-color 0.3s;
+    }
+
+    .letter-textarea:focus {
+      border-color: #ffb347;
+      box-shadow: 0 0 0 3px rgba(255, 179, 71, 0.2);
+    }
+
+    .letter-textarea::placeholder {
+      color: #c9b08a;
+    }
+
+    .letter-close {
+      display: block;
+      margin: 1.5rem auto 0;
+      background: linear-gradient(135deg, #ff6b9d, #ff9ecf);
+      color: white;
+      border: none;
+      border-radius: 50px;
+      padding: 0.6rem 2rem;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      font-family: 'STKaiti', 'KaiTi', '楷体', serif;
+    }
+
+    .letter-close:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 15px rgba(255, 107, 157, 0.4);
+    }
+
+    /* 💌 关闭按钮（遮罩层） */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 204;
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(4px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+    }
+
+    .modal-overlay.show {
+      opacity: 1;
+      pointer-events: auto;
     }
 
     /* 🎆 烟花文字提示 */
@@ -758,6 +933,43 @@
   <div class="wishes-carousel" id="wishes">
     <div class="wish-item" style="animation-delay: 0.2s">🎵 每一句 都是想对你说的话 🎵</div>
   </div>
+
+  <!-- 🎁 礼物盒 -->
+  <div class="gift-section">
+    <div style="text-align:center">
+      <div class="gift-box" id="giftBox" onclick="openGift()">🎁</div>
+      <div class="gift-hint">点击打开礼物 🎀</div>
+    </div>
+  </div>
+</div>
+
+<!-- 遮罩层 -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeAllModals()"></div>
+
+<!-- 💌 信件弹窗 -->
+<div class="letter-modal" id="letterModal">
+  <div class="letter-header">
+    <span class="letter-emoji">💌</span>
+    <div class="letter-title">给 LMX 的一封信</div>
+    <div class="letter-date">From: 永远爱你的人</div>
+  </div>
+
+  <div class="letter-section">
+    <div class="letter-section-title">🎁 我想收到的礼物</div>
+    <textarea class="letter-textarea" id="giftInput" placeholder="写下你最想要的礼物吧～比如想要一支口红、一本书、或者一次特别的旅行..."></textarea>
+  </div>
+
+  <div class="letter-section">
+    <div class="letter-section-title">💖 我的生日感想</div>
+    <textarea class="letter-textarea" id="feelingsInput" placeholder="今天是你的生日，你有什么话想对自己说？或者想对送礼物的人说点什么？"></textarea>
+  </div>
+
+  <div class="letter-section">
+    <div class="letter-section-title">🌟 今年的生日愿望</div>
+    <textarea class="letter-textarea" id="wishInput" placeholder="新的一岁，你许下了什么愿望？"></textarea>
+  </div>
+
+  <button class="letter-close" onclick="closeAllModals()">封好信 💕</button>
 </div>
 
 <p class="footer">Made with ❤️ for LMX</p>
@@ -1181,6 +1393,35 @@
       document.getElementById('candleWrap').classList.remove('lit');
       document.getElementById('birthdayModal').classList.remove('show');
     }, 8000);
+  }
+
+  // 💌 信件弹窗
+  function openGift() {
+    const box = document.getElementById('giftBox');
+    box.style.transform = 'scale(1.2) rotate(15deg)';
+    box.style.transition = 'transform 0.3s';
+    setTimeout(() => {
+      box.style.transform = 'scale(0) rotate(360deg)';
+      box.style.opacity = '0';
+      box.style.transition = 'all 0.4s';
+      document.getElementById('modalOverlay').style.display = 'block';
+      document.getElementById('modalOverlay').style.opacity = '1';
+      setTimeout(() => {
+        document.getElementById('letterModal').classList.add('show');
+      }, 200);
+    }, 300);
+  }
+
+  function closeAllModals() {
+    document.getElementById('letterModal').classList.remove('show');
+    document.getElementById('modalOverlay').style.opacity = '0';
+    setTimeout(() => {
+      document.getElementById('modalOverlay').style.display = 'none';
+      const box = document.getElementById('giftBox');
+      box.style.transform = 'scale(1) rotate(0deg)';
+      box.style.opacity = '1';
+      box.style.transition = 'all 0.3s';
+    }, 300);
   }
 </script>
 </body>
