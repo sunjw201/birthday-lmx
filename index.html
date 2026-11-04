@@ -22,7 +22,8 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      overflow: hidden;
+      overflow-y: auto;
+      overflow-x: hidden;
       position: relative;
       color: white;
     }
@@ -533,39 +534,50 @@
 
     /* 🎁 礼物盒 */
     .gift-section {
-      margin-top: 1.5rem;
+      position: fixed;
+      bottom: 36px;
+      right: 36px;
       display: flex;
-      justify-content: center;
+      flex-direction: column;
+      align-items: center;
+      z-index: 100;
     }
 
     .gift-box {
       cursor: pointer;
-      display: inline-block;
-      font-size: 64px;
-      transition: transform 0.3s ease;
-      filter: drop-shadow(0 8px 16px rgba(255, 107, 157, 0.3));
+      font-size: 52px;
+      transition: transform 0.3s ease, filter 0.3s;
+      filter: drop-shadow(0 0 16px rgba(255, 200, 100, 0.7));
       user-select: none;
+      animation: giftFloat 3s ease-in-out infinite;
     }
 
     .gift-box:hover {
-      transform: scale(1.1) rotate(-3deg);
+      transform: scale(1.15) rotate(-5deg);
+      filter: drop-shadow(0 0 24px rgba(255, 200, 100, 1));
     }
 
     .gift-box:active {
-      transform: scale(0.95);
+      transform: scale(0.92);
     }
 
     .gift-hint {
-      text-align: center;
-      font-size: 0.75rem;
-      color: rgba(255, 255, 255, 0.4);
-      margin-top: 0.5rem;
-      animation: pulse 2s ease-in-out infinite;
+      font-size: 0.72rem;
+      color: rgba(255, 255, 255, 0.55);
+      margin-top: 6px;
+      white-space: nowrap;
+      animation: pulse 2.5s ease-in-out infinite;
+      text-shadow: 0 0 10px rgba(255, 180, 200, 0.5);
+    }
+
+    @keyframes giftFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-6px); }
     }
 
     @keyframes pulse {
       0%, 100% { opacity: 0.4; }
-      50% { opacity: 0.8; }
+      50% { opacity: 0.9; }
     }
 
     /* 💌 信件弹窗 */
@@ -933,14 +945,12 @@
   <div class="wishes-carousel" id="wishes">
     <div class="wish-item" style="animation-delay: 0.2s">🎵 每一句 都是想对你说的话 🎵</div>
   </div>
+</div>
 
-  <!-- 🎁 礼物盒 -->
-  <div class="gift-section">
-    <div style="text-align:center">
-      <div class="gift-box" id="giftBox" onclick="openGift()">🎁</div>
-      <div class="gift-hint">点击打开礼物 🎀</div>
-    </div>
-  </div>
+<!-- 🎁 礼物盒 固定在右下角 -->
+<div class="gift-section">
+  <div class="gift-box" id="giftBox" onclick="openGift()">🎁</div>
+  <div class="gift-hint">点击打开礼物 🎀</div>
 </div>
 
 <!-- 遮罩层 -->
