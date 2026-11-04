@@ -450,11 +450,162 @@
       z-index: 50;
     }
 
+    /* 🎆 烟花 Canvas */
+    #fireworks {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      pointer-events: none;
+      display: none;
+    }
+
+    #fireworks.active { display: block; }
+
+    /* 🕯️ 蜡烛点击区域 */
+    .cake-wrapper {
+      position: relative;
+      display: inline-block;
+      cursor: pointer;
+      margin-bottom: 1rem;
+    }
+
+    .cake-wrapper:hover .cake-hint {
+      opacity: 1;
+    }
+
+    .cake-hint {
+      position: absolute;
+      bottom: -2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.7rem;
+      color: rgba(255, 215, 0, 0.7);
+      white-space: nowrap;
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+    }
+
+    .candle-wrap {
+      position: absolute;
+      top: -30px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .candle {
+      font-size: 36px;
+      position: relative;
+      display: inline-block;
+      transition: transform 0.2s;
+    }
+
+    .flame {
+      display: none;
+      font-size: 22px;
+      position: absolute;
+      top: -20px;
+      left: 50%;
+      transform: translateX(-50%);
+      transform-origin: bottom center;
+      animation: flicker 0.3s ease-in-out infinite alternate;
+    }
+
+    .candle-wrap.lit .flame { display: block; }
+
+    .candle-wrap.lit .candle {
+      animation: candleShake 0.2s ease-in-out infinite alternate;
+    }
+
+    @keyframes flicker {
+      0% { transform: translateX(-50%) scaleY(1) scaleX(1); }
+      100% { transform: translateX(-50%) scaleY(1.15) scaleX(0.9); }
+    }
+
+    @keyframes candleShake {
+      0% { transform: rotate(-2deg); }
+      100% { transform: rotate(2deg); }
+    }
+
+    /* 🎆 烟花文字提示 */
+    .firework-tip {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 2rem;
+      color: white;
+      text-align: center;
+      z-index: 201;
+      animation: fireworkTipPop 2s ease forwards;
+      pointer-events: none;
+      text-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+    }
+
+    @keyframes fireworkTipPop {
+      0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+      20% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+      40% { transform: translate(-50%, -50%) scale(1); }
+      80% { opacity: 1; }
+      100% { opacity: 0; transform: translate(-50%, -60%) scale(1); }
+    }
+
+    /* 🎵 祝你生日快乐弹窗 */
+    .birthday-modal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 24px;
+      padding: 2.5rem 3rem;
+      text-align: center;
+      z-index: 202;
+      box-shadow: 0 20px 60px rgba(255, 107, 157, 0.4);
+      transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+      max-width: 90vw;
+    }
+
+    .birthday-modal.show {
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    .modal-title {
+      font-size: 2rem;
+      background: linear-gradient(135deg, #ff6b9d, #ffd700);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.5rem;
+    }
+
+    .modal-name {
+      font-size: 1.5rem;
+      color: #1a1a2e;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .modal-sub {
+      font-size: 1rem;
+      color: #888;
+      margin-bottom: 1.5rem;
+    }
+
+    .modal-emojis {
+      font-size: 2.5rem;
+      animation: bounce 0.8s ease-in-out infinite;
+    }
+
     /* 📱 响应式调整 */
     @media (max-width: 600px) {
       .balloon { font-size: 40px; }
       .lyric { font-size: 0.9rem; }
       .music-control { top: 1rem; right: 1rem; }
+      .birthday-modal { padding: 1.5rem; }
     }
   </style>
 </head>
@@ -498,17 +649,21 @@
 -->
 <!--
   想换歌？把 music.mp3 上传到仓库，然后改成 src="music/song.mp3"
-  推荐歌曲：可爱女人 / 简单爱 / 星晴 / 七里香
 -->
 <audio id="bgMusic" loop preload="none">
   <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
 </audio>
 
+<!-- 🎆 烟花 Canvas -->
+<canvas id="fireworks"></canvas>
+
 <div class="container">
   <div class="birthday-active">
     <h2 class="wish-title">🎊 生日快乐！🎊</h2>
     <p class="wish-text">
-      亲爱的 LMX，今天是属于你的特别日子<br>
+      亲爱的 LMX，今天是属于你的特别日子
+      愿你永远被爱包围
+      愿你永远闪闪发光 ✨<br>
       愿你所有的期待都能如愿<br>
       愿你被这世界温柔以待<br>
       愿你的每一天都闪闪发光 ✨
@@ -516,7 +671,15 @@
   </div>
 
   <div id="birthday-normal">
-    <span class="cake-emoji">🎂</span>
+    <!-- 🕯️ 点击蛋糕点蜡烛 -->
+    <div class="cake-wrapper" id="cakeWrapper" onclick="lightCandle()">
+      <div class="candle-wrap" id="candleWrap">
+        <div class="flame">🔥</div>
+        <span class="candle">🕯️</span>
+      </div>
+      <span class="cake-emoji">🎂</span>
+      <span class="cake-hint">点击点蜡烛 ❤️</span>
+    </div>
     <h1>Happy Birthday, LMX</h1>
     <p class="date">11 月 09 日</p>
     <div class="divider"></div>
@@ -531,11 +694,20 @@
   </div>
 
   <div class="wishes-carousel" id="wishes">
-    <div class="wish-item" style="animation-delay: 0.2s">🎵 每一条 都是我想对你说的话 🎵</div>
+    <div class="wish-item" style="animation-delay: 0.2s">🎵 每一句 都是想对你说的话 🎵</div>
   </div>
 </div>
 
 <p class="footer">Made with ❤️ for LMX</p>
+
+<!-- 🎵 生日快乐弹窗 -->
+<div class="birthday-modal" id="birthdayModal">
+  <div class="modal-emojis">🎂🎉🎁</div>
+  <div class="modal-title">祝你生日快乐～</div>
+  <div class="modal-name">🎀 我的女孩 LMX 🎀</div>
+  <div class="modal-sub">11 月 09 日 · 属于你的特别日子</div>
+  <div class="modal-emojis">🎈🎊✨</div>
+</div>
 
 <script>
   // 🎵 背景音乐控制
@@ -640,40 +812,38 @@
   }
   setInterval(createHeart, 600);
 
-  // 🎤 飘动歌词 — 全是夸你、爱你、祝福你
+  // 🎤 飘动歌词 — 浪漫夸赞 · 甜蜜告白
   const LYRICS = [
-    '你是世界上最可爱的人',
-    '愿你被岁月温柔以待',
-    '你笑起来真好看',
-    '愿你眼里有光 心中有爱',
-    '你是我见过最美好的存在',
-    '愿你的每一天都闪闪发光',
-    '你值得世间所有的美好',
-    '生日快乐 我最珍贵的你',
-    '愿你永远被幸福包围',
-    '有你在的每一天都是礼物',
-    '你是人间四月天',
-    '愿你永远笑靥如花',
-    '你让平凡的日子发光',
-    '愿你永远被爱包围',
-    '遇见你是我的幸运',
-    '愿你心想事成 万事胜意',
-    '你是独一无二的美好',
-    '愿你眼里永远有星星',
-    '你让世界变得温柔',
-    '生日快乐 愿所有美好如期而至',
-    '你是我心中的光',
-    '愿你永远做快乐的小孩',
-    '你值得所有的掌声与爱',
-    '愿你被这个世界温柔相待',
-    '你是我最想守护的人',
-    '愿你岁岁平安 天天开心',
-    '你让每一天都值得期待',
-    '愿你永远保持热爱奔赴山海',
-    '你是我珍藏的宝贝',
-    '愿你活成自己想要的样子',
+    '你好漂亮啊 真的好好看',
+    '你笑起来的样子真甜',
+    '你的眼睛像星星一样闪亮',
+    '我好喜欢你',
+    '你是我见过最美的风景',
+    '心动的瞬间 都是因为你',
+    '你的温柔让我沦陷',
+    '想陪你走过每一个四季',
+    '你是上天给我最好的礼物',
+    '遇见你 是我最大的幸运',
+    '你是我心中唯一的宝贝',
     '你让我的世界有了颜色',
-    '生日快乐 LMX',
+    '想一直这样看着你笑',
+    '你的每一次回眸 都让我心动',
+    '我愿意陪你到世界尽头',
+    '有你在 每天都值得期待',
+    '你让我的心跳漏了一拍',
+    '我好想你',
+    '愿所有美好 都为你而来',
+    '你值得 被全世界宠爱',
+    '我的眼里只有你',
+    '想跟你虚度时光',
+    '你是我藏不住的心动',
+    '愿你永远天真 永远可爱',
+    '想牵着你的手 一直走下去',
+    '你让平凡的日常变得特别',
+    '我的女孩 生日快乐',
+    '愿你永远做自己的太阳',
+    '你是我不想醒来的梦',
+    '生日快乐 我的女孩',
   ];
 
   let lyricIndex = 0;
@@ -756,6 +926,200 @@
 
   updateCountdown();
   setInterval(updateCountdown, 1000);
+
+  // =============================================
+  // 🕯️ 点击蛋糕点蜡烛 + 烟花 + 生日快乐歌
+  // =============================================
+
+  let candleLit = false;
+
+  function lightCandle() {
+    if (candleLit) return;
+    candleLit = true;
+
+    const candleWrap = document.getElementById('candleWrap');
+    const modal = document.getElementById('birthdayModal');
+
+    // 1️⃣ 点燃蜡烛
+    candleWrap.classList.add('lit');
+
+    // 2️⃣ 显示生日弹窗
+    setTimeout(() => {
+      modal.classList.add('show');
+    }, 400);
+
+    // 3️⃣ 播放生日快乐歌（用 Web Audio API 合成）
+    setTimeout(() => {
+      playHappyBirthday();
+    }, 600);
+
+    // 4️⃣ 放烟花
+    setTimeout(() => {
+      modal.classList.remove('show');
+      launchFireworks();
+    }, 2000);
+  }
+
+  // 🎵 用 Web Audio API 合成《祝你生日快乐》
+  function playHappyBirthday() {
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+
+      // 祝你生日快乐 简谱频率 (Hz)
+      // "祝 你 生 日 快 乐 ~"
+      const melody = [
+        { freq: 264,  dur: 0.3 }, // C4 祝
+        { freq: 264,  dur: 0.15 }, // C4 你
+        { freq: 297,  dur: 0.45 }, // D4 生
+        { freq: 264,  dur: 0.45 }, // C4 日
+        { freq: 352,  dur: 0.45 }, // F4 快
+        { freq: 330,  dur: 0.9 },  // E4 乐
+        { freq: 264,  dur: 0.3 },  // C4 祝
+        { freq: 264,  dur: 0.15 }, // C4 你
+        { freq: 297,  dur: 0.45 }, // D4 生
+        { freq: 264,  dur: 0.45 }, // C4 日
+        { freq: 396,  dur: 0.45 }, // G4 了
+        { freq: 352,  dur: 0.9 },  // F4 ~ (很长)
+        { freq: 264,  dur: 0.3 },  // C4 祝
+        { freq: 264,  dur: 0.15 }, // C4 你
+        { freq: 440,  dur: 0.45 }, // A4 生
+        { freq: 352,  dur: 0.45 }, // F4 日
+        { freq: 330,  dur: 0.45 }, // E4 快
+        { freq: 297,  dur: 0.45 }, // D4 乐
+        { freq: 440,  dur: 0.6 },  // A4 祝你
+        { freq: 396,  dur: 0.6 },  // G4 生日
+        { freq: 352,  dur: 0.45 }, // F4 快
+        { freq: 330,  dur: 0.9 },  // E4 乐~
+      ];
+
+      let t = ctx.currentTime;
+      melody.forEach(note => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.value = note.freq;
+        gain.gain.setValueAtTime(0.35, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + note.dur * 0.9);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(t);
+        osc.stop(t + note.dur);
+        t += note.dur;
+      });
+    } catch (e) {
+      console.log('Audio not supported');
+    }
+  }
+
+  // 🎆 烟花效果
+  let fireActive = false;
+
+  function launchFireworks() {
+    const canvas = document.getElementById('fireworks');
+    const ctx = canvas.getContext('2d');
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    canvas.classList.add('active');
+    fireActive = true;
+
+    // 随机烟花颜色
+    const COLORS = [
+      '#ff6b9d', '#ffd700', '#ff9ecf', '#7dd3fc',
+      '#a78bfa', '#86efac', '#fca5a5', '#fdba74',
+      '#f472b6', '#34d399', '#fbbf24', '#60a5fa'
+    ];
+
+    class Particle {
+      constructor(x, y, color) {
+        this.x = x;
+        this.y = y;
+        this.color = color;
+        const angle = Math.random() * Math.PI * 2;
+        const speed = 2 + Math.random() * 4;
+        this.vx = Math.cos(angle) * speed;
+        this.vy = Math.sin(angle) * speed;
+        this.alpha = 1;
+        this.decay = 0.015 + Math.random() * 0.01;
+        this.size = 2 + Math.random() * 3;
+        this.gravity = 0.05;
+      }
+
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        this.vy += this.gravity;
+        this.vx *= 0.99;
+        this.alpha -= this.decay;
+      }
+
+      draw(ctx) {
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, this.alpha);
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    const particles = [];
+    let animId;
+
+    function explode(x, y) {
+      const color = COLORS[Math.floor(Math.random() * COLORS.length)];
+      for (let i = 0; i < 80; i++) {
+        particles.push(new Particle(x, y, color));
+      }
+    }
+
+    function animate() {
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      particles.forEach(p => {
+        p.update();
+        p.draw(ctx);
+      });
+
+      // 移除已消亡粒子
+      for (let i = particles.length - 1; i >= 0; i--) {
+        if (particles[i].alpha <= 0) particles.splice(i, 1);
+      }
+
+      // 随机爆炸烟花
+      if (Math.random() < 0.06) {
+        explode(
+          Math.random() * canvas.width * 0.8 + canvas.width * 0.1,
+          Math.random() * canvas.height * 0.5 + canvas.height * 0.05
+        );
+      }
+
+      animId = requestAnimationFrame(animate);
+    }
+
+    // 连续放多轮烟花
+    explode(canvas.width / 2, canvas.height * 0.3);
+    setTimeout(() => explode(canvas.width * 0.3, canvas.height * 0.2), 400);
+    setTimeout(() => explode(canvas.width * 0.7, canvas.height * 0.25), 800);
+    setTimeout(() => explode(canvas.width * 0.5, canvas.height * 0.15), 1200);
+    setTimeout(() => explode(canvas.width * 0.2, canvas.height * 0.3), 1600);
+    setTimeout(() => explode(canvas.width * 0.8, canvas.height * 0.2), 2000);
+
+    animate();
+
+    // 烟花持续8秒后关闭
+    setTimeout(() => {
+      cancelAnimationFrame(animId);
+      canvas.classList.remove('active');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      fireActive = false;
+      candleLit = false;
+      document.getElementById('candleWrap').classList.remove('lit');
+      document.getElementById('birthdayModal').classList.remove('show');
+    }, 8000);
+  }
 </script>
 </body>
 </html>
