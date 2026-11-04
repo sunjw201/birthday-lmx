@@ -4,19 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Happy Birthday, LMX 🎂</title>
-  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-  <script>
-    // 页面加载时立即初始化 EmailJS
-    (function () {
-      console.log('[EmailJS] SDK loaded?', typeof emailjs !== 'undefined');
-      if (typeof emailjs !== 'undefined') {
-        emailjs.init('0UX2H_1F2ZAugpeU9');
-        console.log('[EmailJS] init success');
-      } else {
-        console.error('[EmailJS] SDK FAILED to load from CDN');
-      }
-    })();
-  </script>
+  <script src="https://fastly.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   <style>
     :root {
       --pink: #ff6b9d;
