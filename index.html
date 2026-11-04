@@ -386,6 +386,60 @@
       100% { transform: translateY(110vh) rotate(720deg); }
     }
 
+    /* 🎈 气球 */
+    .balloon {
+      position: fixed;
+      bottom: -120px;
+      z-index: 3;
+      font-size: 60px;
+      animation: balloonRise linear infinite;
+      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+    }
+
+    @keyframes balloonRise {
+      0% {
+        transform: translateY(0) translateX(0) rotate(0deg);
+        opacity: 1;
+      }
+      25% { transform: translateY(-27vh) translateX(15px) rotate(5deg); }
+      50% { transform: translateY(-55vh) translateX(-10px) rotate(-4deg); }
+      75% { transform: translateY(-82vh) translateX(12px) rotate(3deg); }
+      100% {
+        transform: translateY(-115vh) translateX(0) rotate(0deg);
+        opacity: 0.3;
+      }
+    }
+
+    /* 🎤 飘动歌词 */
+    .lyric {
+      position: fixed;
+      white-space: nowrap;
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: rgba(255, 255, 255, 0.85);
+      text-shadow: 0 2px 12px rgba(0, 0, 0, 0.6);
+      pointer-events: none;
+      z-index: 10;
+      opacity: 0;
+      animation: lyricFloat linear infinite;
+    }
+
+    @keyframes lyricFloat {
+      0%   { transform: translateX(105vw) translateY(0); opacity: 0; }
+      8%   { opacity: 0.9; }
+      70%  { opacity: 0.85; }
+      90%  { opacity: 0; }
+      100% { transform: translateX(-55vw) translateY(0); opacity: 0; }
+    }
+
+    /* 🎤 歌词来源 */
+    .lyric-source {
+      position: fixed;
+      font-size: 0.6rem;
+      color: rgba(255, 255, 255, 0.3);
+      pointer-events: none;
+    }
+
     /* 🌟 底部署名 */
     .footer {
       position: fixed;
@@ -393,12 +447,23 @@
       font-size: 0.75rem;
       color: rgba(255, 255, 255, 0.2);
       letter-spacing: 1px;
+      z-index: 50;
+    }
+
+    /* 📱 响应式调整 */
+    @media (max-width: 600px) {
+      .balloon { font-size: 40px; }
+      .lyric { font-size: 0.9rem; }
+      .music-control { top: 1rem; right: 1rem; }
     }
   </style>
 </head>
 <body>
 
 <div class="particles" id="particles"></div>
+
+<!-- 🎈 气球容器 -->
+<div id="balloons"></div>
 
 <!-- 🎵 音乐播放器 -->
 <div class="music-control" id="musicControl" title="点击播放/暂停背景音乐">
@@ -431,6 +496,10 @@
   2. 修改下面 src 的值为你的音乐链接
   3. 推荐格式：MP3，文件小于 10MB 效果更好
 -->
+<!--
+  想换歌？把 music.mp3 上传到仓库，然后改成 src="music/song.mp3"
+  推荐歌曲：可爱女人 / 简单爱 / 星晴 / 七里香
+-->
 <audio id="bgMusic" loop preload="none">
   <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
 </audio>
@@ -439,7 +508,7 @@
   <div class="birthday-active">
     <h2 class="wish-title">🎊 生日快乐！🎊</h2>
     <p class="wish-text">
-      亲爱的小明，今天是属于你的特别日子<br>
+      亲爱的 LMX，今天是属于你的特别日子<br>
       愿你所有的期待都能如愿<br>
       愿你被这世界温柔以待<br>
       愿你的每一天都闪闪发光 ✨
@@ -462,11 +531,7 @@
   </div>
 
   <div class="wishes-carousel" id="wishes">
-    <div class="wish-item" style="animation-delay: 0.2s">🌸 愿你眼里全是阳光，笑里全是坦荡</div>
-    <div class="wish-item" style="animation-delay: 0.8s">⭐ 前路浩浩荡荡，万事皆可期待</div>
-    <div class="wish-item" style="animation-delay: 1.4s">🌙 所求皆如愿，所行皆化坦途</div>
-    <div class="wish-item" style="animation-delay: 2s">🎁 永远保持热爱，奔赴下一场山海</div>
-    <div class="wish-item" style="animation-delay: 2.6s">💖 愿你被岁月温柔相待</div>
+    <div class="wish-item" style="animation-delay: 0.2s">🎵 歌词来源：周杰伦 🎵</div>
   </div>
 </div>
 
@@ -520,6 +585,34 @@
     progress.style.width = '0%';
   });
 
+  // 🎈 创建气球
+  const BALLOON_COLORS = [
+    { emoji: '🎈', hue: 340 },
+    { emoji: '🎈', hue: 200 },
+    { emoji: '🎈', hue: 45 },
+    { emoji: '🎈', hue: 280 },
+    { emoji: '🎈', hue: 160 },
+  ];
+  const balloonsContainer = document.getElementById('balloons');
+
+  function createBalloon() {
+    const color = BALLOON_COLORS[Math.floor(Math.random() * BALLOON_COLORS.length)];
+    const el = document.createElement('div');
+    el.className = 'balloon';
+    el.innerHTML = color.emoji;
+    el.style.left = (5 + Math.random() * 90) + '%';
+    el.style.fontSize = (40 + Math.random() * 30) + 'px';
+    el.style.animationDuration = (8 + Math.random() * 6) + 's';
+    el.style.animationDelay = Math.random() * 0.5 + 's';
+    // 气球颜色滤镜
+    el.style.filter = `hue-rotate(${color.hue}deg) drop-shadow(0 4px 8px rgba(0,0,0,0.3))`;
+    balloonsContainer.appendChild(el);
+    setTimeout(() => el.remove(), 16000);
+  }
+
+  // 每隔1.5秒升起一个气球
+  setInterval(createBalloon, 1500);
+
   // ✨ 创建背景星星
   const particles = document.getElementById('particles');
   for (let i = 0; i < 80; i++) {
@@ -546,6 +639,72 @@
     setTimeout(() => heart.remove(), 10000);
   }
   setInterval(createHeart, 600);
+
+  // 🎤 飘动歌词
+  const LYRICS = [
+    { text: '漂亮的让我面红的可爱女人', song: '可爱女人' },
+    { text: '温柔的让我心疼的可爱女人', song: '可爱女人' },
+    { text: '透明的让我感动的可爱女人', song: '可爱女人' },
+    { text: '坏坏的让我疯狂的可爱女人', song: '可爱女人' },
+    { text: '载着你仿佛载着阳光 不管到哪里都是晴天', song: '星晴' },
+    { text: '手牵手 一步两步三步四步 望着天', song: '星晴' },
+    { text: '看星星一颗两颗三颗四颗 连成线', song: '星晴' },
+    { text: '我想就这样牵着你的手不放开', song: '简单爱' },
+    { text: '爱能不能够永远单纯没有悲哀', song: '简单爱' },
+    { text: '我想带你 回我的外婆家', song: '简单爱' },
+    { text: '一起看着日落 一直到我们都睡着', song: '简单爱' },
+    { text: '窗外的麻雀 在电线杆上站成一行', song: '七里香' },
+    { text: '那温暖的阳光 像刚摘的鲜艳草莓', song: '七里香' },
+    { text: '你是我唯一想要的了解', song: '七里香' },
+    { text: '我受够等待你所谓的安排', song: '龙卷风' },
+    { text: '爱情来得太快就像龙卷风', song: '龙卷风' },
+    { text: '离不开暴风圈来不及逃', song: '龙卷风' },
+    { text: '听妈妈的话 别让她受伤', song: '听妈妈的话' },
+    { text: '想快快长大 才能保护她', song: '听妈妈的话' },
+    { text: '美丽的白发 幸福中发芽', song: '听妈妈的话' },
+    { text: '天使的魔法 温暖中慈祥', song: '听妈妈的话' },
+    { text: '天青色等烟雨 而我在等你', song: '青花瓷' },
+    { text: '炊烟袅袅升起 隔江千万里', song: '青花瓷' },
+    { text: '你发如雪 凄美了离别', song: '发如雪' },
+    { text: '我等待苍老了谁', song: '发如雪' },
+    { text: '海鸟和鱼相爱 只是一场意外', song: '珊瑚海' },
+    { text: '转身离开 明明说不明白', song: '珊瑚海' },
+    { text: '但偏偏 偏偏 让我遇见你', song: '园游会' },
+    { text: '你是我藏在心里的感动', song: '园游会' },
+    { text: '甜甜的 嘴角 甜甜的说话', song: '园游会' },
+    { text: '祝 LMX 生日快乐 天天开心', song: '💖' },
+    { text: '愿你眼里有光 心中有爱', song: '💖' },
+  ];
+
+  let lyricIndex = 0;
+
+  function createLyric() {
+    const lyric = LYRICS[lyricIndex % LYRICS.length];
+    lyricIndex++;
+
+    const el = document.createElement('div');
+    el.className = 'lyric';
+    el.textContent = '♪ ' + lyric.text;
+    el.style.top = (15 + Math.random() * 65) + '%';
+
+    const duration = 12 + Math.random() * 8;
+    el.style.animationDuration = duration + 's';
+
+    // 颜色变化
+    const colors = ['#ff9ecf', '#ffd700', '#7dd3fc', '#a78bfa', '#86efac', '#fca5a5', '#fdba74'];
+    el.style.color = colors[Math.floor(Math.random() * colors.length)];
+    el.style.textShadow = `0 2px 12px ${colors[Math.floor(Math.random() * colors.length)]}66`;
+
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), (duration + 2) * 1000);
+  }
+
+  // 错开启动时间，歌词陆续入场
+  LYRICS.forEach((_, i) => {
+    setTimeout(createLyric, i * 2000);
+  });
+  // 之后每4秒飘入一条
+  setInterval(createLyric, 4000);
 
   // 🎇 生日当天的彩带
   function createConfetti() {
@@ -576,9 +735,12 @@
 
     if (isBirthday) {
       document.body.classList.add('is-birthday');
-      for (let i = 0; i < 3; i++) setTimeout(createConfetti, i * 300);
-      setInterval(() => createConfetti(), 400);
+      for (let i = 0; i < 5; i++) setTimeout(createConfetti, i * 200);
+      setInterval(() => createConfetti(), 300);
       return;
+    } else {
+      // 非生日也撒一点彩带，保持氛围
+      if (Math.random() < 0.15) createConfetti();
     }
 
     const d = Math.floor(diff / 86400000);
