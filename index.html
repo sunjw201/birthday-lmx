@@ -4,6 +4,13 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Happy Birthday, LMX 🎂</title>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script>
+    // 页面加载时立即初始化 EmailJS
+    (function () {
+      emailjs.init('0UX2H_1F2ZAugpeU9');
+    })();
+  </script>
   <style>
     :root {
       --pink: #ff6b9d;
@@ -1435,47 +1442,50 @@
   }
 
   // 📧 EmailJS 发送信件
-  (function initEmailJS() {
-    const script = document.createElement('script');
-    script.src = 'https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js';
-    script.onload = () => {
-      emailjs.init('0UX2H_1F2ZAugpeU9'); // Public Key
-    };
-    document.head.appendChild(script);
-  })();
-
   document.getElementById('sealBtn').addEventListener('click', function () {
     const btn = this;
     btn.textContent = '寄信中... 💨';
     btn.disabled = true;
 
-    const gift = document.getElementById('giftInput').value.trim();
-    const feelings = document.getElementById('feelingsInput').value.trim();
-    const wish = document.getElementById('wishInput').value.trim();
-    const now = new Date();
-    const dateStr = `${now.getFullYear()}年${now.getMonth() + 1}月${now.getDate()}日`;
+    // 等 SDK 加载完成再发
+    const trySend = () => {
+      if (typeof emailjs === 'undefined') {
+        btn.textContent = '加载中，稍等... ⏳';
+        setTimeout(trySend, 500);
+        return;
+      }
 
-    const templateParams = {
-      date: dateStr,
-      gift: gift || '（未填写）',
-      feelings: feelings || '（未填写）',
-      wish: wish || '（未填写）'
+      const gift = document.getElementById('giftInput').value.trim();
+      const feelings = document.getElementById('feelingsInput').value.trim();
+      const wish = document.getElementById('wishInput').value.trim();
+      const now = new Date();
+      const dateStr = `${now.getFullYear()}年${now.getMonth() + 1}月${now.getDate()}日`;
+
+      const templateParams = {
+        date: dateStr,
+        gift: gift || '（未填写）',
+        feelings: feelings || '（未填写）',
+        wish: wish || '（未填写）'
+      };
+
+      emailjs.send('service_cntgsi7', 'template_zqi4d7o', templateParams)
+        .then(() => {
+          btn.textContent = '已寄出 ✨';
+          setTimeout(() => {
+            btn.textContent = '封好信 💕';
+            btn.disabled = false;
+            closeAllModals();
+          }, 1500);
+        }, function (err) {
+          btn.textContent = '寄信失败 😢';
+          btn.disabled = false;
+          setTimeout(() => { btn.textContent = '封好信 💕'; }, 2500);
+          console.error('EmailJS Error:', err);
+          alert('发送失败，请检查网络后重试。错误信息：' + JSON.stringify(err));
+        });
     };
 
-    emailjs.send('service_cntgsi7', 'template_zqi4d7o', templateParams)
-      .then(() => {
-        btn.textContent = '已寄出 ✨';
-        setTimeout(() => {
-          btn.textContent = '封好信 💕';
-          btn.disabled = false;
-          closeAllModals();
-        }, 1500);
-      }, function (err) {
-        btn.textContent = '寄信失败 😢';
-        btn.disabled = false;
-        setTimeout(() => { btn.textContent = '封好信 💕'; }, 2000);
-        console.error('EmailJS Error:', err);
-      });
+    trySend();
   });
 </script>
 </body>
