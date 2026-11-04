@@ -1434,27 +1434,48 @@
     }, 300);
   }
 
-  // 📧 点击"封好信" → 自动打开邮件客户端，发送信件内容
+  // 📧 EmailJS 发送信件
+  (function initEmailJS() {
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js';
+    script.onload = () => {
+      emailjs.init('0UX2H_1F2ZAugpeU9'); // Public Key
+    };
+    document.head.appendChild(script);
+  })();
+
   document.getElementById('sealBtn').addEventListener('click', function () {
+    const btn = this;
+    btn.textContent = '寄信中... 💨';
+    btn.disabled = true;
+
     const gift = document.getElementById('giftInput').value.trim();
     const feelings = document.getElementById('feelingsInput').value.trim();
     const wish = document.getElementById('wishInput').value.trim();
-    const to = '514717392@qq.com';
-    const subject = encodeURIComponent('💌 来自 LMX 的生日心愿信');
     const now = new Date();
     const dateStr = `${now.getFullYear()}年${now.getMonth() + 1}月${now.getDate()}日`;
-    const body = encodeURIComponent(
-      `🌟 生日快乐！LMX 的心愿信 🌟\n` +
-      `写信日期：${dateStr}\n` +
-      `━━━━━━━━━━━━━━━━━━━━━━\n\n` +
-      `🎁 我想收到的礼物：\n${gift || '（未填写）'}\n\n` +
-      `💖 我的生日感想：\n${feelings || '（未填写）'}\n\n` +
-      `🌟 今年的生日愿望：\n${wish || '（未填写）'}\n\n` +
-      `━━━━━━━━━━━━━━━━━━━━━━\n` +
-      `来自 ${to} 发送的爱意 💕`
-    );
-    window.location.href = `mailto:${to}?subject=${subject}&body=${body}`;
-    closeAllModals();
+
+    const templateParams = {
+      date: dateStr,
+      gift: gift || '（未填写）',
+      feelings: feelings || '（未填写）',
+      wish: wish || '（未填写）'
+    };
+
+    emailjs.send('service_cntgsi7', 'template_zqi4d7o', templateParams)
+      .then(() => {
+        btn.textContent = '已寄出 ✨';
+        setTimeout(() => {
+          btn.textContent = '封好信 💕';
+          btn.disabled = false;
+          closeAllModals();
+        }, 1500);
+      }, function (err) {
+        btn.textContent = '寄信失败 😢';
+        btn.disabled = false;
+        setTimeout(() => { btn.textContent = '封好信 💕'; }, 2000);
+        console.error('EmailJS Error:', err);
+      });
   });
 </script>
 </body>
