@@ -979,7 +979,7 @@
     <textarea class="letter-textarea" id="wishInput" placeholder="新的一岁，你许下了什么愿望？"></textarea>
   </div>
 
-  <button class="letter-close" onclick="closeAllModals()">封好信 💕</button>
+  <button class="letter-close" id="sealBtn">封好信 💕</button>
 </div>
 
 <p class="footer">Made with ❤️ for LMX</p>
@@ -1433,6 +1433,29 @@
       box.style.transition = 'all 0.3s';
     }, 300);
   }
+
+  // 📧 点击"封好信" → 自动打开邮件客户端，发送信件内容
+  document.getElementById('sealBtn').addEventListener('click', function () {
+    const gift = document.getElementById('giftInput').value.trim();
+    const feelings = document.getElementById('feelingsInput').value.trim();
+    const wish = document.getElementById('wishInput').value.trim();
+    const to = '514717392@qq.com';
+    const subject = encodeURIComponent('💌 来自 LMX 的生日心愿信');
+    const now = new Date();
+    const dateStr = `${now.getFullYear()}年${now.getMonth() + 1}月${now.getDate()}日`;
+    const body = encodeURIComponent(
+      `🌟 生日快乐！LMX 的心愿信 🌟\n` +
+      `写信日期：${dateStr}\n` +
+      `━━━━━━━━━━━━━━━━━━━━━━\n\n` +
+      `🎁 我想收到的礼物：\n${gift || '（未填写）'}\n\n` +
+      `💖 我的生日感想：\n${feelings || '（未填写）'}\n\n` +
+      `🌟 今年的生日愿望：\n${wish || '（未填写）'}\n\n` +
+      `━━━━━━━━━━━━━━━━━━━━━━\n` +
+      `来自 ${to} 发送的爱意 💕`
+    );
+    window.location.href = `mailto:${to}?subject=${subject}&body=${body}`;
+    closeAllModals();
+  });
 </script>
 </body>
 </html>
