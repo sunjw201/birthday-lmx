@@ -16,102 +16,72 @@ body {
   flex-direction: column;
   align-items: center;
 }
-h1 { margin: 20px; font-size: 1.3rem; color: #ff6b9d; text-align: center; }
-p.sub { font-size: 0.85rem; color: rgba(255,255,255,0.5); margin-bottom: 15px; }
+h1 { margin: 20px 10px 5px; font-size: 1.2rem; color: #ff6b9d; text-align: center; }
+p.sub { font-size: 0.8rem; color: rgba(255,255,255,0.45); margin-bottom: 15px; }
 button {
-  padding: 10px 24px;
+  padding: 9px 22px;
   background: linear-gradient(135deg, #ff6b9d, #ff8a80);
   border: none;
   border-radius: 25px;
   color: white;
-  font-size: 1rem;
+  font-size: 0.95rem;
   cursor: pointer;
-  margin-bottom: 20px;
+  margin-bottom: 15px;
+  transition: transform 0.15s;
 }
-button:active { transform: scale(0.96); }
-
-.canvas-wrap { position: relative; width: 400px; height: 400px; }
-
+button:active { transform: scale(0.95); }
+.wrap { position: relative; width: 380px; height: 380px; }
 .polaroid {
   position: absolute;
-  width: 62px;
-  height: 82px;
+  width: 58px;
   background: white;
-  border-radius: 4px;
-  padding: 5px;
-  padding-bottom: 14px;
+  border-radius: 3px;
+  padding: 4px 4px 12px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.35);
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  font-size: 0.6rem;
-  color: #333;
+  font-family: 'STKaiti', 'KaiTi', serif;
+  font-size: 0.55rem;
+  color: #444;
   text-align: center;
   line-height: 1.3;
   user-select: none;
   opacity: 0;
-  transition: opacity 0.3s;
-  font-family: 'STKaiti', 'KaiTi', serif;
+  will-change: transform, opacity;
 }
-.polaroid .photo {
-  width: 52px;
-  height: 44px;
-  background: linear-gradient(135deg, #ffe0ec, #ffd6f0);
+.photo {
+  width: 50px;
+  height: 40px;
+  background: linear-gradient(135deg, #fff0f5, #ffe0ec);
   border-radius: 2px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.4rem;
+  font-size: 1.3rem;
   margin-bottom: 3px;
 }
-.polaroid.emoji-card .photo { background: none; }
-
-/* 爱心轮廓点（从上方飞入） */
-@keyframes flyIn {
-  from {
-    opacity: 0;
-    transform: translateY(-200px) translateX(var(--dx)) rotate(var(--rot)) scale(0.3);
-  }
-  60% {
-    opacity: 1;
-    transform: translateY(10px) translateX(0) rotate(0deg) scale(1.05);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) translateX(0) rotate(0deg) scale(1);
-  }
-}
-
-.heart-particle {
-  position: absolute;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  pointer-events: none;
-}
-@keyframes particleFly {
-  from { opacity: 1; transform: translate(var(--fx, 0px), var(--fy, 0px)) scale(1); }
-  to   { opacity: 0; transform: translate(calc(var(--fx, 0px) * 3), calc(var(--fy, 0px) * 3 - 80px)) scale(0); }
-}
+.emoji-photo { background: none !important; }
 </style>
 </head>
 <body>
-<h1>💖 爱心卡片动画效果演示</h1>
-<p class="sub">点击按钮，小卡片依次飞入排列成爱心形状</p>
-<button onclick="startAnimation()">▶ 播放动画</button>
-<div class="canvas-wrap" id="wrap"></div>
+<h1>爱心卡片动画效果</h1>
+<p class="sub">点击按钮，小卡片依次飞入排列成爱心</p>
+<button onclick="startAnim()">&#9654; 播放动画</button>
+<div class="wrap" id="wrap"></div>
 <script>
-// 爱心轮廓坐标（以中心为原点，200px宽高）
 const HEART = [
-  {x:-0,-80},{x:0,y:-80},{x:-5,y:-75},{x:-5,y:-65},{x:-10,y:-60},{x:-15,y:-55},{x:-20,y:-45},{x:-25,y:-38},{x:-28,y:-28},{x:-30,y:-18},{x:-30,y:-8},{x:-28,y:2},{x:-25,y:10},{x:-22,y:18},{x:-18,y:26},{x:-12,y:34},{x:-6,y:42},{x:0,y:50},{x:6,y:42},{x:12,y:34},{x:18,y:26},{x:22,y:18},{x:25,y:10},{x:28,y:2},{x:30,y:-8},{x:30,y:-18},{x:28,y:-28},{x:25,y:-38},{x:20,y:-45},{x:15,y:-55},{x:10,y:-60},{x:5,y:-65},{x:5,y:-75},
-  // 内层填充
-  {x:-8,y:-45},{x:-12,y:-35},{x:-16,y:-25},{x:-18,y:-12},{x:-16,y:0},{x:-12,y:10},{x:-6,y:18},{x:0,y:24},{x:6,y:18},{x:12,y:10},{x:16,y:0},{x:18,y:-12},{x:16,y:-25},{x:12,y:-35},{x:8,y:-45},
-  {x:-5,y:-25},{x:-5,y:-15},{x:0,y:-10},{x:5,y:-15},{x:5,y:-25}
+  {x:0,y:-78},{x:-7,y:-72},{x:-14,y:-64},{x:-20,y:-56},{x:-26,y:-46},{x:-30,y:-35},{x:-32,y:-22},{x:-32,y:-10},{x:-30,y:2},{x:-26,y:12},{x:-22,y:21},{x:-16,y:30},{x:-8,y:37},{x:0,y:42},{x:8,y:37},{x:16,y:30},{x:22,y:21},{x:26,y:12},{x:30,y:2},{x:32,y:-10},{x:32,y:-22},{x:30,y:-35},{x:26,y:-46},{x:20,y:-56},{x:14,y:-64},{x:7,y:-72},
+  {x:-18,y:-28},{x:-22,y:-16},{x:-22,y:-2},{x:-18,y:8},{x:-12,y:16},{x:-4,y:22},{x:4,y:22},{x:12,y:16},{x:18,y:8},{x:22,y:-2},{x:22,y:-16},{x:18,y:-28},
+  {x:-10,y:-12},{x:-10,y:2},{x:0,y:8},{x:10,y:2},{x:10,y:-12}
 ];
 
-const PHRASES = [
-  '你好漂亮','真的好好看','我好喜欢你','心动的瞬间','想陪你走过四季','你是我最好的礼物','愿你每天都闪闪发光','爱你哦','你是我的小可爱','最美的风景就是你','温柔如水','愿你被世界温柔以待','想一直陪着你','我的宝贝','甜甜的','你好可爱呀','愿你开心每一天','永远爱你','你是我的阳光','可爱到犯规'
+const MSGS = [
+  '你好漂亮','真的好好看','我好喜欢你','心动的瞬间','想陪你走过四季',
+  '你是我最好的礼物','愿你每天都闪闪发光','爱你哦','你是我的小可爱',
+  '最美的风景就是你','温柔如水','永远爱你','我的宝贝','甜甜的',
+  '你好可爱呀','愿你开心每一天','你是我的阳光','可爱到犯规',
+  '想一直陪着你','愿你被世界温柔以待'
 ];
 
 const EMOJIS = ['💕','🌸','✨','💖','💗','🌷','🦋','💫','🌺','💐'];
@@ -125,91 +95,52 @@ function shuffle(arr) {
   return a;
 }
 
-function startAnimation() {
+function startAnim() {
   const wrap = document.getElementById('wrap');
   wrap.innerHTML = '';
+  const cx = 190, cy = 190, scale = 1.15;
+  const order = shuffle([...HEART.keys()]);
+  const msgs = shuffle(MSGS);
+  const emjs = shuffle(EMOJIS);
 
-  const cx = 200, cy = 200;
-  const cards = shuffle([...HEART]);
-  const phrases = shuffle(PHRASES);
-  const emojis = shuffle(EMOJIS);
+  order.forEach((heartIdx, i) => {
+    const pt = HEART[heartIdx];
+    const tx = cx + pt.x * scale;
+    const ty = cy + pt.y * scale;
+    const startX = tx + (Math.random() - 0.5) * 360;
+    const startY = ty - 320 - Math.random() * 150;
+    const rot = (Math.random() - 0.5) * 50;
+    const finalRot = (Math.random() - 0.5) * 14;
 
-  // 计算飞入方向（从正上方随机分散）
-  const angles = shuffle([-60,-45,-30,-15,0,15,30,45,60]);
-
-  cards.forEach((pt, i) => {
     const card = document.createElement('div');
-    card.className = 'polaroid' + (i % 3 === 0 ? ' emoji-card' : '');
+    card.className = 'polaroid';
+    card.style.left = startX + 'px';
+    card.style.top = startY + 'px';
+    card.style.transform = `rotate(${rot}deg)`;
 
-    const px = cx + pt.x * 1.2;
-    const py = cy + pt.y * 1.2;
-    card.style.left = px + 'px';
-    card.style.top = py + 'px';
-
-    // 飞入方向（从顶部随机位置进入）
-    const angle = angles[i % angles.length];
-    const dist = 300 + Math.random() * 150;
-    const dx = Math.sin(angle * Math.PI / 180) * dist;
-    const rot = (Math.random() - 0.5) * 720;
-
-    card.style.setProperty('--dx', dx + 'px');
-    card.style.setProperty('--rot', rot + 'deg');
-
-    if (i % 3 === 0) {
-      card.innerHTML = `<div class="photo">${emojis[i % emojis.length]}</div>`;
+    if (i % 4 === 0) {
+      card.innerHTML = `<div class="photo emoji-photo">${emjs[i % emjs.length]}</div>`;
     } else {
-      card.innerHTML = `<div class="photo"></div><span>${phrases[i % phrases.length]}</span>`;
+      card.innerHTML = `<div class="photo"></div><span>${msgs[i % msgs.length]}</span>`;
     }
 
-    // 每张卡片延迟飞入
-    const delay = i * 80;
+    wrap.appendChild(card);
+
+    // 延迟后飞入
     setTimeout(() => {
       card.style.opacity = '1';
-      card.style.animation = `flyIn 0.7s cubic-bezier(0.34,1.56,0.64,1) ${angle/1000}s forwards`;
-      card.style.setProperty('--dx', dx + 'px');
-      card.style.setProperty('--rot', rot + 'deg');
-      wrap.appendChild(card);
+      card.style.transition = `transform ${550 + i * 10}ms cubic-bezier(0.34,1.56,0.64,1), opacity 0.3s`;
+      card.style.transform = `translate(${tx - startX}px, ${ty - startY}px) rotate(${finalRot}deg)`;
 
-      // 飞入过程中卡片随机旋转
+      // 完成后发光
       setTimeout(() => {
-        card.style.transform = `rotate(${(Math.random()-0.5)*12}deg)`;
-        card.style.transition = 'transform 0.3s';
-      }, 800 + angle/1000*1000);
-    }, delay);
-
-    // 完成后发光效果
-    setTimeout(() => {
-      card.style.boxShadow = '0 0 20px rgba(255,107,157,0.7), 0 4px 12px rgba(0,0,0,0.35)';
-    }, 1500 + i * 80);
-
-    // 小粒子效果
-    if (i % 5 === 0) {
-      setTimeout(() => spawnParticles(wrap, px, py), 1600 + i * 80);
-    }
+        card.style.boxShadow = `0 0 18px rgba(255,107,157,0.65), 0 4px 12px rgba(0,0,0,0.3)`;
+      }, 650 + i * 10);
+    }, i * 75);
   });
 }
 
-function spawnParticles(wrap, x, y) {
-  for (let i = 0; i < 5; i++) {
-    const p = document.createElement('div');
-    p.className = 'heart-particle';
-    const colors = ['#ff6b9d','#ffb3c6','#ffd700','#ff8a80','#ff69b4'];
-    p.style.background = colors[i % colors.length];
-    p.style.left = x + 'px';
-    p.style.top = y + 'px';
-    p.style.position = 'absolute';
-    const fx = (Math.random() - 0.5) * 100;
-    const fy = (Math.random() - 0.5) * 60;
-    p.style.setProperty('--fx', fx + 'px');
-    p.style.setProperty('--fy', fy + 'px');
-    p.style.animation = `particleFly 1s ease-out ${i * 0.1}s forwards`;
-    wrap.appendChild(p);
-    setTimeout(() => p.remove(), 1200);
-  }
-}
-
-// 默认自动播放一次
-setTimeout(startAnimation, 300);
+setTimeout(startAnim, 400);
 </script>
 </body>
 </html>
