@@ -1434,32 +1434,31 @@
     }, 300);
   }
 
-  // 📧 Web3Forms 发送信件
+  // 📧 封好信：一键复制信件内容
   function sendLetterByMail() {
-    const btn = document.getElementById('sealBtn');
-    btn.textContent = '寄信中... 💨';
-    btn.disabled = true;
-
     const gift = document.getElementById('giftInput').value.trim();
     const feelings = document.getElementById('feelingsInput').value.trim();
     const wish = document.getElementById('wishInput').value.trim();
     const now = new Date();
     const dateStr = now.getFullYear() + '年' + (now.getMonth() + 1) + '月' + now.getDate() + '日';
+    const letterText =
+      '🌟 生日快乐！LMX 的心愿信 🌟\n' +
+      '写信日期：' + dateStr + '\n' +
+      '━━━━━━━━━━━━━━━━━━━━━━\n\n' +
+      '🎁 我想收到的礼物：\n' + (gift || '（未填写）') + '\n\n' +
+      '💖 我的生日感想：\n' + (feelings || '（未填写）') + '\n\n' +
+      '🌟 今年的生日愿望：\n' + (wish || '（未填写）') + '\n\n' +
+      '━━━━━━━━━━━━━━━━━━━━━━\n' +
+      '💕';
 
-    const formData = new FormData();
-    formData.append('access_key', '5817c1c8-43f4-4c53-9df4-75b43b29d610');
-    formData.append('subject', '来自 LMX 的生日心愿信');
-    formData.append('写信日期', dateStr);
-    formData.append('礼物愿望', gift || '（未填写）');
-    formData.append('生日感想', feelings || '（未填写）');
-    formData.append('生日愿望', wish || '（未填写）');
+    const btn = document.getElementById('sealBtn');
+    btn.textContent = '复制中... 💨';
+    btn.disabled = true;
 
-    fetch('https://api.web3forms.com/submit', {
-      method: 'POST',
-      body: formData
-    }).then(res => res.json()).then(data => {
-      if (data.status === 'success') {
-        btn.textContent = '已寄出 ✨';
+    // 复制到剪贴板
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(letterText).then(() => {
+        btn.textContent = '已复制！发给我 ✨';
         setTimeout(() => {
           btn.textContent = '封好信 💕';
           btn.disabled = false;
@@ -1467,17 +1466,31 @@
           document.getElementById('giftInput').value = '';
           document.getElementById('feelingsInput').value = '';
           document.getElementById('wishInput').value = '';
-        }, 1500);
-      } else {
-        btn.textContent = '寄信失败 😢 ' + (data.message || '');
-        btn.disabled = false;
-        setTimeout(() => { btn.textContent = '封好信 💕'; }, 3000);
-      }
-    }).catch(() => {
-      btn.textContent = '寄信失败 😢';
-      btn.disabled = false;
-      setTimeout(() => { btn.textContent = '封好信 💕'; }, 2500);
-    });
+        }, 2000);
+      }).catch(() => {
+        showCopyFallback(letterText, btn);
+      });
+    } else {
+      showCopyFallback(letterText, btn);
+    }
+  }
+
+  function showCopyFallback(text, btn) {
+    // 浏览器不支持剪贴板API，显示文字让用户手动复制
+    closeAllModals();
+    document.getElementById('modalOverlay').style.display = 'block';
+    document.getElementById('modalOverlay').style.opacity = '1';
+    const modal = document.createElement('div');
+    modal.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);transition:transform 0.4s cubic-bezier(0.34,1.56,0.64,1);z-index:210;background:linear-gradient(145deg,#fffef5,#fff9e6);border-radius:20px;padding:2rem;width:min(520px,92vw);max-height:80vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.4);font-family:STKaiti,KaiTi,楷体,serif;';
+    modal.innerHTML =
+      '<div style="text-align:center;margin-bottom:1.5rem;"><span style="font-size:2.5rem;">📋</span><div style="font-size:1.2rem;font-weight:bold;color:#c0392b;margin-top:0.5rem;">长按下方文字全选复制</div><div style="font-size:0.8rem;color:#888;margin-top:0.3rem;">然后发给我（微信/QQ/邮箱均可）</div></div>' +
+      '<div id="copyText" style="background:#f9f5ec;padding:1rem;border-radius:12px;color:#333;white-space:pre-wrap;word-break:break-all;line-height:1.7;font-size:0.9rem;max-height:50vh;overflow-y:auto;user-select:text;">' + text + '</div>' +
+      '<button onclick="this.closest(\'.modal-overlay\').click()" style="margin-top:1.5rem;width:100%;padding:0.8rem;background:linear-gradient(135deg,#ff6b9d,#ff8a80);color:white;border:none;border-radius:12px;font-size:1rem;cursor:pointer;">好的 💕</button>';
+    modal.id = 'copyModal';
+    document.body.appendChild(modal);
+    btn.textContent = '封好信 💕';
+    btn.disabled = false;
+    setTimeout(() => { modal.style.transform = 'translate(-50%,-50%) scale(1)'; }, 10);
   }
 </script>
 </body>
