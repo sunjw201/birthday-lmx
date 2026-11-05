@@ -956,9 +956,6 @@
 <!-- 遮罩层 -->
 <div class="modal-overlay" id="modalOverlay" onclick="closeAllModals()"></div>
 
-<!-- 隐藏 iframe，接收表单提交结果 -->
-<iframe name="formTarget" id="formTarget" style="display:none" onload="onFormLoaded()"></iframe>
-
 <!-- 💌 信件弹窗 -->
 <div class="letter-modal" id="letterModal">
   <div class="letter-header">
@@ -967,32 +964,22 @@
     <div class="letter-date">From: 永远爱你的人</div>
   </div>
 
-  <form id="letterForm" action="https://formsubmit.co/sunjingwei0201@outlook.com" method="POST" target="formTarget">
-    <input type="hidden" name="_subject" value="LMX 生日心愿信">
-    <input type="hidden" name="_captcha" value="false">
-    <input type="hidden" name="_next" id="formNext">
-    <input type="hidden" name="写信日期" id="formDate">
-    <input type="hidden" name="礼物愿望" id="formGift">
-    <input type="hidden" name="生日感想" id="formFeelings">
-    <input type="hidden" name="生日愿望" id="formWish">
+  <div class="letter-section">
+    <div class="letter-section-title">🎁 我想收到的礼物</div>
+    <textarea class="letter-textarea" id="giftInput" placeholder="写下你最想要的礼物吧～比如想要一支口红、一本书、或者一次特别的旅行..."></textarea>
+  </div>
 
-    <div class="letter-section">
-      <div class="letter-section-title">🎁 我想收到的礼物</div>
-      <textarea class="letter-textarea" id="giftInput" placeholder="写下你最想要的礼物吧～比如想要一支口红、一本书、或者一次特别的旅行..."></textarea>
-    </div>
+  <div class="letter-section">
+    <div class="letter-section-title">💖 我的生日感想</div>
+    <textarea class="letter-textarea" id="feelingsInput" placeholder="今天是你的生日，你有什么话想对自己说？或者想对送礼物的人说点什么？"></textarea>
+  </div>
 
-    <div class="letter-section">
-      <div class="letter-section-title">💖 我的生日感想</div>
-      <textarea class="letter-textarea" id="feelingsInput" placeholder="今天是你的生日，你有什么话想对自己说？或者想对送礼物的人说点什么？"></textarea>
-    </div>
+  <div class="letter-section">
+    <div class="letter-section-title">🌟 今年的生日愿望</div>
+    <textarea class="letter-textarea" id="wishInput" placeholder="新的一岁，你许下了什么愿望？"></textarea>
+  </div>
 
-    <div class="letter-section">
-      <div class="letter-section-title">🌟 今年的生日愿望</div>
-      <textarea class="letter-textarea" id="wishInput" placeholder="新的一岁，你许下了什么愿望？"></textarea>
-    </div>
-
-    <button type="submit" class="letter-close" id="sealBtn">封好信 💕</button>
-  </form>
+  <button type="button" class="letter-close" id="sealBtn" onclick="sendLetterByMail()">封好信 💕</button>
 </div>
 
 <p class="footer">Made with ❤️ for LMX</p>
@@ -1447,48 +1434,35 @@
     }, 300);
   }
 
-  // 📧 FormSubmit 发送信件（用 iframe 接收结果，不跳转页面）
-  let formSent = false;
-
-  document.getElementById('letterForm').addEventListener('submit', function (e) {
-    if (formSent) { e.preventDefault(); return; }
-    const btn = document.getElementById('sealBtn');
-    // 提交前填充数据
+  // 📧 用 mailto 打开 QQ 邮箱网页版写信
+  function sendLetterByMail() {
+    const gift = document.getElementById('giftInput').value.trim();
+    const feelings = document.getElementById('feelingsInput').value.trim();
+    const wish = document.getElementById('wishInput').value.trim();
     const now = new Date();
-    document.getElementById('formDate').value =
-      now.getFullYear() + '年' + (now.getMonth() + 1) + '月' + now.getDate() + '日';
-    document.getElementById('formGift').value = document.getElementById('giftInput').value || '（未填写）';
-    document.getElementById('formFeelings').value = document.getElementById('feelingsInput').value || '（未填写）';
-    document.getElementById('formWish').value = document.getElementById('wishInput').value || '（未填写）';
-    document.getElementById('formNext').value = window.location.href + '?sent=1';
-    btn.textContent = '寄信中... 💨';
-    btn.disabled = true;
-    formSent = true;
-  });
-
-  function onFormLoaded() {
-    if (!formSent) return;
+    const dateStr = now.getFullYear() + '年' + (now.getMonth() + 1) + '月' + now.getDate() + '日';
+    const body =
+      '🌟 生日快乐！LMX 的心愿信 🌟\n' +
+      '写信日期：' + dateStr + '\n' +
+      '━━━━━━━━━━━━━━━━━━━━━━\n\n' +
+      '🎁 我想收到的礼物：\n' + (gift || '（未填写）') + '\n\n' +
+      '💖 我的生日感想：\n' + (feelings || '（未填写）') + '\n\n' +
+      '🌟 今年的生日愿望：\n' + (wish || '（未填写）') + '\n\n' +
+      '━━━━━━━━━━━━━━━━━━━━━━\n' +
+      '💕';
+    const subject = encodeURIComponent('💌 来自 LMX 的生日心愿信');
+    const encodedBody = encodeURIComponent(body);
+    // 打开 QQ 邮箱写信页面，自动填充收件人、标题、正文
+    window.open(
+      'https://mail.qq.com/cgi-bin/compose?action=compose&to=514717392@qq.com&subject=' + subject + '&body=' + encodedBody,
+      '_blank'
+    );
     const btn = document.getElementById('sealBtn');
-    const params = new URLSearchParams(window.location.search);
-    if (params.get('sent') === '1') {
-      btn.textContent = '已寄出 ✨';
-      setTimeout(() => {
-        btn.textContent = '封好信 💕';
-        btn.disabled = false;
-        formSent = false;
-        closeAllModals();
-        document.getElementById('giftInput').value = '';
-        document.getElementById('feelingsInput').value = '';
-        document.getElementById('wishInput').value = '';
-        // 清除 URL 参数
-        history.replaceState(null, '', window.location.pathname);
-      }, 1500);
-    } else {
-      btn.textContent = '寄信失败 😢';
-      btn.disabled = false;
-      formSent = false;
-      setTimeout(() => { btn.textContent = '封好信 💕'; }, 2500);
-    }
+    btn.textContent = '已打开写信页 ✨';
+    setTimeout(() => {
+      btn.textContent = '封好信 💕';
+      closeAllModals();
+    }, 2000);
   }
 </script>
 </body>
