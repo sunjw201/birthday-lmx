@@ -1434,7 +1434,7 @@
     }, 300);
   }
 
-  // 📧 用 mailto 打开 QQ 邮箱网页版写信
+  // 📧 用 mailto 打开邮箱写信
   function sendLetterByMail() {
     const gift = document.getElementById('giftInput').value.trim();
     const feelings = document.getElementById('feelingsInput').value.trim();
@@ -1452,11 +1452,8 @@
       '💕';
     const subject = encodeURIComponent('💌 来自 LMX 的生日心愿信');
     const encodedBody = encodeURIComponent(body);
-    // 打开 QQ 邮箱写信页面，自动填充收件人、标题、正文
-    window.open(
-      'https://mail.qq.com/cgi-bin/compose?action=compose&to=514717392@qq.com&subject=' + subject + '&body=' + encodedBody,
-      '_blank'
-    );
+    // 用 mailto: 协议，会自动调用系统邮件或浏览器打开邮箱网页版
+    window.location.href = 'mailto:514717392@qq.com?subject=' + subject + '&body=' + encodedBody;
     const btn = document.getElementById('sealBtn');
     btn.textContent = '已打开写信页 ✨';
     setTimeout(() => {
