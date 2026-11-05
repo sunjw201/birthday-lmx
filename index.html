@@ -1434,32 +1434,50 @@
     }, 300);
   }
 
-  // 📧 用 mailto 打开邮箱写信
+  // 📧 Web3Forms 发送信件
   function sendLetterByMail() {
+    const btn = document.getElementById('sealBtn');
+    btn.textContent = '寄信中... 💨';
+    btn.disabled = true;
+
     const gift = document.getElementById('giftInput').value.trim();
     const feelings = document.getElementById('feelingsInput').value.trim();
     const wish = document.getElementById('wishInput').value.trim();
     const now = new Date();
     const dateStr = now.getFullYear() + '年' + (now.getMonth() + 1) + '月' + now.getDate() + '日';
-    const body =
-      '🌟 生日快乐！LMX 的心愿信 🌟\n' +
-      '写信日期：' + dateStr + '\n' +
-      '━━━━━━━━━━━━━━━━━━━━━━\n\n' +
-      '🎁 我想收到的礼物：\n' + (gift || '（未填写）') + '\n\n' +
-      '💖 我的生日感想：\n' + (feelings || '（未填写）') + '\n\n' +
-      '🌟 今年的生日愿望：\n' + (wish || '（未填写）') + '\n\n' +
-      '━━━━━━━━━━━━━━━━━━━━━━\n' +
-      '💕';
-    const subject = encodeURIComponent('💌 来自 LMX 的生日心愿信');
-    const encodedBody = encodeURIComponent(body);
-    // 用 mailto: 协议，会自动调用系统邮件或浏览器打开邮箱网页版
-    window.location.href = 'mailto:514717392@qq.com?subject=' + subject + '&body=' + encodedBody;
-    const btn = document.getElementById('sealBtn');
-    btn.textContent = '已打开写信页 ✨';
-    setTimeout(() => {
-      btn.textContent = '封好信 💕';
-      closeAllModals();
-    }, 2000);
+
+    const formData = new FormData();
+    formData.append('access_key', '5817c1c8-43f4-4c53-9df4-75b43b29d610');
+    formData.append('subject', '来自 LMX 的生日心愿信');
+    formData.append('写信日期', dateStr);
+    formData.append('礼物愿望', gift || '（未填写）');
+    formData.append('生日感想', feelings || '（未填写）');
+    formData.append('生日愿望', wish || '（未填写）');
+
+    fetch('https://api.web3forms.com/submit', {
+      method: 'POST',
+      body: formData
+    }).then(res => res.json()).then(data => {
+      if (data.status === 'success') {
+        btn.textContent = '已寄出 ✨';
+        setTimeout(() => {
+          btn.textContent = '封好信 💕';
+          btn.disabled = false;
+          closeAllModals();
+          document.getElementById('giftInput').value = '';
+          document.getElementById('feelingsInput').value = '';
+          document.getElementById('wishInput').value = '';
+        }, 1500);
+      } else {
+        btn.textContent = '寄信失败 😢 ' + (data.message || '');
+        btn.disabled = false;
+        setTimeout(() => { btn.textContent = '封好信 💕'; }, 3000);
+      }
+    }).catch(() => {
+      btn.textContent = '寄信失败 😢';
+      btn.disabled = false;
+      setTimeout(() => { btn.textContent = '封好信 💕'; }, 2500);
+    });
   }
 </script>
 </body>
