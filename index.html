@@ -956,6 +956,9 @@
 <!-- 遮罩层 -->
 <div class="modal-overlay" id="modalOverlay" onclick="closeAllModals()"></div>
 
+<!-- 隐藏 iframe，接收表单提交结果 -->
+<iframe name="formTarget" id="formTarget" style="display:none" onload="onFormLoaded()"></iframe>
+
 <!-- 💌 信件弹窗 -->
 <div class="letter-modal" id="letterModal">
   <div class="letter-header">
@@ -964,14 +967,14 @@
     <div class="letter-date">From: 永远爱你的人</div>
   </div>
 
-  <form id="letterForm" action="https://formsubmit.co/sunjingwei0201@outlook.com" method="POST">
-    <input type="hidden" name="_subject" value="来自 LMX 的生日心愿信">
+  <form id="letterForm" action="https://formsubmit.co/sunjingwei0201@outlook.com" method="POST" target="formTarget">
+    <input type="hidden" name="_subject" value="LMX 生日心愿信">
     <input type="hidden" name="_captcha" value="false">
     <input type="hidden" name="_next" id="formNext">
     <input type="hidden" name="写信日期" id="formDate">
-    <input type="hidden" name="🎁_礼物愿望" id="formGift">
-    <input type="hidden" name="💖_生日感想" id="formFeelings">
-    <input type="hidden" name="🌟_生日愿望" id="formWish">
+    <input type="hidden" name="礼物愿望" id="formGift">
+    <input type="hidden" name="生日感想" id="formFeelings">
+    <input type="hidden" name="生日愿望" id="formWish">
 
     <div class="letter-section">
       <div class="letter-section-title">🎁 我想收到的礼物</div>
@@ -988,7 +991,7 @@
       <textarea class="letter-textarea" id="wishInput" placeholder="新的一岁，你许下了什么愿望？"></textarea>
     </div>
 
-    <button type="submit" class="letter-close" id="sealBtn" onclick="return prepareAndSend(event)">封好信 💕</button>
+    <button type="submit" class="letter-close" id="sealBtn">封好信 💕</button>
   </form>
 </div>
 
@@ -1444,49 +1447,48 @@
     }, 300);
   }
 
-  // 📧 FormSubmit 发送信件
-  function prepareAndSend(e) {
-    e.preventDefault();
+  // 📧 FormSubmit 发送信件（用 iframe 接收结果，不跳转页面）
+  let formSent = false;
+
+  document.getElementById('letterForm').addEventListener('submit', function (e) {
+    if (formSent) { e.preventDefault(); return; }
     const btn = document.getElementById('sealBtn');
+    // 提交前填充数据
     const now = new Date();
     document.getElementById('formDate').value =
       now.getFullYear() + '年' + (now.getMonth() + 1) + '月' + now.getDate() + '日';
     document.getElementById('formGift').value = document.getElementById('giftInput').value || '（未填写）';
     document.getElementById('formFeelings').value = document.getElementById('feelingsInput').value || '（未填写）';
     document.getElementById('formWish').value = document.getElementById('wishInput').value || '（未填写）';
-    document.getElementById('formNext').value = window.location.href;
-
+    document.getElementById('formNext').value = window.location.href + '?sent=1';
     btn.textContent = '寄信中... 💨';
     btn.disabled = true;
+    formSent = true;
+  });
 
-    const form = document.getElementById('letterForm');
-    fetch(form.action, {
-      method: 'POST',
-      body: new FormData(form),
-      headers: { 'Accept': 'application/json' }
-    }).then(res => {
-      if (res.ok) {
-        btn.textContent = '已寄出 ✨';
-        setTimeout(() => {
-          btn.textContent = '封好信 💕';
-          btn.disabled = false;
-          closeAllModals();
-          document.getElementById('giftInput').value = '';
-          document.getElementById('feelingsInput').value = '';
-          document.getElementById('wishInput').value = '';
-        }, 1500);
-      } else {
-        btn.textContent = '寄信失败 😢';
+  function onFormLoaded() {
+    if (!formSent) return;
+    const btn = document.getElementById('sealBtn');
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('sent') === '1') {
+      btn.textContent = '已寄出 ✨';
+      setTimeout(() => {
+        btn.textContent = '封好信 💕';
         btn.disabled = false;
-        setTimeout(() => { btn.textContent = '封好信 💕'; }, 2500);
-      }
-    }).catch(() => {
+        formSent = false;
+        closeAllModals();
+        document.getElementById('giftInput').value = '';
+        document.getElementById('feelingsInput').value = '';
+        document.getElementById('wishInput').value = '';
+        // 清除 URL 参数
+        history.replaceState(null, '', window.location.pathname);
+      }, 1500);
+    } else {
       btn.textContent = '寄信失败 😢';
       btn.disabled = false;
+      formSent = false;
       setTimeout(() => { btn.textContent = '封好信 💕'; }, 2500);
-    });
-
-    return false;
+    }
   }
 </script>
 </body>
