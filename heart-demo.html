@@ -17,109 +17,106 @@ body {
   justify-content: center;
 }
 .trigger {
-  position: fixed;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  z-index: 10;
-  transition: opacity 0.8s;
+  position: fixed; inset: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  z-index: 10; transition: opacity 0.8s;
 }
 .trigger.hidden { opacity: 0; pointer-events: none; }
-.trigger h2 {
-  font-size: 2rem;
-  color: #e84a7a;
-  margin-bottom: 0.5rem;
-}
+.trigger h2 { font-size: 2rem; color: #e84a7a; margin-bottom: 0.5rem; }
 .trigger p { color: #c27; font-size: 1rem; margin-bottom: 2rem; }
 .btn-start {
   padding: 14px 40px;
   background: linear-gradient(135deg, #ff6b9d, #ff8a80);
-  border: none;
-  border-radius: 50px;
-  color: white;
-  font-size: 1.2rem;
-  font-family: inherit;
-  cursor: pointer;
+  border: none; border-radius: 50px;
+  color: white; font-size: 1.2rem;
+  font-family: inherit; cursor: pointer;
   box-shadow: 0 8px 30px rgba(255,107,157,0.4);
-  animation: pulse 2s ease-in-out infinite;
 }
-@keyframes pulse {
-  0%,100% { transform: scale(1); box-shadow: 0 8px 30px rgba(255,107,157,0.4); }
-  50% { transform: scale(1.05); box-shadow: 0 12px 40px rgba(255,107,157,0.6); }
-}
-.heart-wrap {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 5;
-}
+.heart-wrap { position: fixed; inset: 0; pointer-events: none; z-index: 5; }
 .heart-wrap.hidden { display: none; }
-
 .card {
   position: absolute;
-  width: 64px;
+  width: 60px;
   background: #fffbfc;
   border-radius: 3px;
-  padding: 5px 5px 16px;
-  box-shadow: 2px 3px 12px rgba(200,80,120,0.18), 0 1px 3px rgba(0,0,0,0.08);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  padding: 5px 5px 14px;
+  box-shadow: 2px 3px 12px rgba(200,80,120,0.18);
+  display: flex; flex-direction: column; align-items: center;
   opacity: 0;
-  will-change: transform, opacity;
 }
 .card-inner {
-  width: 54px;
-  height: 46px;
-  border-radius: 2px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.6rem;
-  margin-bottom: 4px;
+  width: 50px; height: 42px; border-radius: 2px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.5rem; margin-bottom: 3px;
 }
-.card-txt {
-  font-size: 0.58rem;
-  color: #b05070;
-  text-align: center;
-  line-height: 1.3;
-  letter-spacing: 0.5px;
-}
+.card-txt { font-size: 0.55rem; color: #b05070; text-align: center; line-height: 1.25; }
 </style>
 </head>
 <body>
 
-<!-- 触发页 -->
 <div class="trigger" id="trigger">
   <h2>💖 点我，有惊喜 💖</h2>
   <p>每一句，都是想对你说的话</p>
   <button class="btn-start" onclick="start()">🎁 打开惊喜</button>
 </div>
 
-<!-- 爱心卡片区 -->
 <div class="heart-wrap hidden" id="heartWrap"></div>
 
 <script>
-// 爱心轮廓坐标（以屏幕中心为原点，数值需乘 scale）
-const HEART_OUTER = [
-  {x:0,y:-80},{x:-8,y:-73},{x:-15,y:-64},{x:-22,y:-55},{x:-28,y:-44},{x:-32,y:-32},{x:-35,y:-18},{x:-35,y:-4},{x:-33,y:10},{x:-28,y:22},{x:-22,y:32},{x:-14,y:40},{x:-6,y:46},{x:0,y:50},{x:6,y:46},{x:14,y:40},{x:22,y:32},{x:28,y:22},{x:33,y:10},{x:35,y:-4},{x:35,y:-18},{x:32,y:-32},{x:28,y:-44},{x:22,y:-55},{x:15,y:-64},{x:8,y:-73},
+// 爱心轮廓点（手调，确保是标准爱心）
+const HEART = [
+  // 顶部凹陷
+  {x:0,   y:-42},
+  // 左上半弧
+  {x:-8,  y:-38},
+  {x:-16, y:-30},
+  {x:-22, y:-20},
+  {x:-26, y:-10},
+  {x:-28, y:0},
+  // 左下尖
+  {x:-30, y:10},
+  {x:-28, y:20},
+  {x:-24, y:30},
+  {x:-18, y:40},
+  {x:-10, y:50},
+  {x:-4,  y:56},
+  // 底部尖
+  {x:0,   y:60},
+  // 右下尖
+  {x:4,   y:56},
+  {x:10,  y:50},
+  {x:18,  y:40},
+  {x:24,  y:30},
+  {x:28,  y:20},
+  {x:30,  y:10},
+  // 右上半弧
+  {x:28,  y:0},
+  {x:26,  y:-10},
+  {x:22,  y:-20},
+  {x:16,  y:-30},
+  {x:8,   y:-38},
+  // 内层（填满爱心内部）
+  {x:-14, y:-12},
+  {x:-14, y:4},
+  {x:-8,  y:14},
+  {x:0,   y:20},
+  {x:8,   y:14},
+  {x:14,  y:4},
+  {x:14,  y:-12},
+  {x:0,   y:0},
+  {x:-8,  y:4},
+  {x:8,   y:4},
+  {x:0,   y:10},
 ];
-const HEART_MID = [
-  {x:-20,y:-26},{x:-24,y:-14},{x:-24,y:0},{x:-20,y:12},{x:-13,y:22},{x:-5,y:28},{x:5,y:28},{x:13,y:22},{x:20,y:12},{x:24,y:0},{x:24,y:-14},{x:20,y:-26},
-];
-const HEART_INNER = [
-  {x:-11,y:-12},{x:-11,y:2},{x:0,y:10},{x:11,y:2},{x:11,y:-12},
-];
-const HEART = [...HEART_OUTER, ...HEART_MID, ...HEART_INNER];
 
 const MSGS = [
-  '你是我','最好的礼物','真的真的','好好看啊','我好喜欢你','想一直','陪着你','心动的瞬间','都是因为你','我的宝贝','最爱的人','爱你哟','甜甜的','永远在一起','你笑起来','真好看','想和你一起','走很远很远','我的女孩','愿你快乐'
+  '你是我最好的礼物','真的真的好好看','我好喜欢你','想一直陪着你','心动的瞬间都是因为你',
+  '我的宝贝','最爱的人','爱你哟','甜甜的','永远在一起','你笑起来真好看','想和你一起走很远很远',
+  '我的女孩','愿你快乐每一天','温柔如水','愿你被世界温柔以待','可爱到犯规','你是我的阳光'
 ];
-
-const EMOJIS = ['💕','💖','💗','🌸','✨','🌷','🦋','💫','🌺','💐','🤍','💓','🌹','🎀','🍃','🐰','🎂','🌙','⭐','🍰'];
-const CARD_BG = ['#fff0f5','#fff5fb','#fef0f5','#fff8fc','#ffeef4','#fff3f8','#ffe0ec','#fff0fa'];
+const EMOJIS = ['💕','💖','💗','🌸','✨','🌷','🦋','💫','🌺','💐','🤍','💓','🌹','🎀','🍃','🐰','🎂','🌙'];
+const BGS = ['#fff0f5','#fff5fb','#fef0f5','#fff8fc','#ffeef4','#fff3f8','#ffe0ec','#fff0fa'];
 
 function shuffle(arr) {
   const a = [...arr];
@@ -133,59 +130,52 @@ function shuffle(arr) {
 function start() {
   const trigger = document.getElementById('trigger');
   const wrap = document.getElementById('heartWrap');
-
   trigger.classList.add('hidden');
   wrap.classList.remove('hidden');
 
   const W = window.innerWidth;
   const H = window.innerHeight;
   const cx = W / 2;
-  const cy = H / 2 - 30;
-  const scale = Math.min(W, H) / 450;
+  const cy = H / 2 - 20;
+  const scale = Math.min(W, H) / 380;
 
   const order = shuffle([...Array(HEART.length).keys()]);
   const msgs = shuffle(MSGS);
   const emjs = shuffle(EMOJIS);
-  const bgs = shuffle(CARD_BG);
+  const bgs = shuffle(BGS);
 
   order.forEach((heartIdx, i) => {
     const pt = HEART[heartIdx];
     const tx = cx + pt.x * scale;
     const ty = cy + pt.y * scale;
-
-    // 随机从上方飞入，起始点带随机横向偏移
-    const sx = tx + (Math.random() - 0.5) * W * 1.1;
-    const sy = ty - H * 0.7 - Math.random() * H * 0.4;
-    const startRot = (Math.random() - 0.5) * 80;
-    const endRot = (Math.random() - 0.5) * 16;
+    const sx = tx + (Math.random() - 0.5) * W * 1.0;
+    const sy = ty - H * 0.6 - Math.random() * H * 0.35;
+    const sRot = (Math.random() - 0.5) * 80;
+    const eRot = (Math.random() - 0.5) * 14;
 
     const card = document.createElement('div');
     card.className = 'card';
     card.style.left = sx + 'px';
     card.style.top = sy + 'px';
-    card.style.transform = `rotate(${startRot}deg)`;
+    card.style.transform = `rotate(${sRot}deg)`;
 
     const isEmoji = i % 4 === 0;
     const bg = bgs[i % bgs.length];
-
     if (isEmoji) {
-      card.innerHTML = `<div class="card-inner" style="background:${bg};font-size:2rem;">${emjs[i % emjs.length]}</div>`;
+      card.innerHTML = `<div class="card-inner" style="background:${bg};font-size:1.8rem;">${emjs[i % emjs.length]}</div>`;
     } else {
       card.innerHTML = `<div class="card-inner" style="background:${bg};"></div><span class="card-txt">${msgs[i % msgs.length]}</span>`;
     }
-
     wrap.appendChild(card);
 
-    const delay = i * 90;
     setTimeout(() => {
       card.style.opacity = '1';
-      card.style.transition = `transform ${520 + i * 8}ms cubic-bezier(0.25,0.46,0.45,0.94), opacity 0.25s`;
-      card.style.transform = `translate(${tx - sx}px, ${ty - sy}px) rotate(${endRot}deg)`;
-
+      card.style.transition = `transform ${500}ms cubic-bezier(0.25,0.46,0.45,0.94), opacity 0.2s`;
+      card.style.transform = `translate(${tx-sx}px,${ty-sy}px) rotate(${eRot}deg)`;
       setTimeout(() => {
-        card.style.boxShadow = `0 0 20px rgba(255,107,157,0.55), 2px 3px 12px rgba(200,80,120,0.2)`;
-      }, 600 + i * 8);
-    }, delay);
+        card.style.boxShadow = `0 0 18px rgba(255,107,157,0.5), 2px 3px 10px rgba(200,80,120,0.15)`;
+      }, 600);
+    }, i * 85);
   });
 }
 </script>
