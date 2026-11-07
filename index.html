@@ -865,6 +865,11 @@
 <!-- 🎈 气球容器 -->
 <div id="balloons"></div>
 
+<!-- 🎵 背景音乐 -->
+<audio id="bgMusic" loop preload="none">
+  <source src="quiet-room.mp3" type="audio/mpeg">
+</audio>
+
 <!-- 🎵 音乐播放器 -->
 <div class="music-control" id="musicControl" title="点击播放背景音乐">
   <div class="music-icon-wrap">
@@ -881,12 +886,6 @@
   </div>
   <div class="music-progress">
     <div class="music-progress-bar" id="musicProgress"></div>
-  </div>
-  <!-- 播放器展开区域 -->
-  <div id="musicEmbed" style="display:none;margin-top:0.5rem;width:100%;max-width:300px;border-radius:12px;overflow:hidden;">
-    <iframe id="musicIframe" frameborder="0" border="0" marginwidth="0" marginheight="0"
-      width="100%" height="90"
-      src="https://music.163.com/outchain/player?id=3336111061&type=0"></iframe>
   </div>
 </div>
 
@@ -986,27 +985,35 @@
 </div>
 
 <script>
-  // 🎵 背景音乐控制（网易云音乐嵌入式播放器）
+  // 🎵 背景音乐控制（本地 MP3）
   const control = document.getElementById('musicControl');
   const icon = document.getElementById('musicIcon');
   const status = document.getElementById('musicStatus');
   const hint = document.getElementById('musicHint');
-  const musicEmbed = document.getElementById('musicEmbed');
+  const progress = document.getElementById('musicProgress');
+  const bgMusic = document.getElementById('bgMusic');
 
   let musicOpen = false;
 
   // 隐藏提示
   setTimeout(() => { if (hint) hint.remove(); }, 4000);
 
+  bgMusic.addEventListener('timeupdate', () => {
+    if (bgMusic.duration) {
+      progress.style.width = (bgMusic.currentTime / bgMusic.duration * 100) + '%';
+    }
+  });
+  bgMusic.addEventListener('ended', () => { progress.style.width = '0%'; });
+
   control.addEventListener('click', () => {
     musicOpen = !musicOpen;
     if (musicOpen) {
-      musicEmbed.style.display = 'block';
+      bgMusic.play().catch(() => {});
       control.classList.add('playing');
       icon.textContent = '🎶';
       status.textContent = '播放中';
     } else {
-      musicEmbed.style.display = 'none';
+      bgMusic.pause();
       control.classList.remove('playing');
       icon.textContent = '🎵';
       status.textContent = '已暂停';
