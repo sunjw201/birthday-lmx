@@ -896,9 +896,7 @@
 <div class="overlay">
   <div class="particles" id="particles"></div>
   <div id="balloons"></div>
-  <audio id="bgMusic" loop preload="metadata">
-    <source src="quiet-room.mp3" type="audio/mpeg">
-  </audio>
+  <audio id="bgMusic" loop preload="metadata"></audio>
   <div class="music-control" id="musicControl" title="点击播放背景音乐">
     <div class="music-icon-wrap">
       <span class="music-icon" id="musicIcon">🎵</span>
@@ -1012,15 +1010,27 @@
 </div>
 
 <script>
-  // 🎵 背景音乐控制（本地 MP3）
+  // 🎵 背景音乐控制（多歌曲列表）
   const control = document.getElementById('musicControl');
   const icon = document.getElementById('musicIcon');
   const status = document.getElementById('musicStatus');
   const hint = document.getElementById('musicHint');
   const progress = document.getElementById('musicProgress');
+  const musicTitle = document.querySelector('.music-title');
   const bgMusic = document.getElementById('bgMusic');
 
+  const now = new Date();
+  const isBirthday = now.getMonth() === 10 && now.getDate() === 9;
+  const PLAYLIST = isBirthday
+    ? ['quiet-room.mp3', 'really-like-you.mp3', 'birthday-song.mp3']
+    : ['quiet-room.mp3', 'really-like-you.mp3'];
+  const SONG_NAMES = isBirthday
+    ? ['Quiet Room', 'Really Like You', '生日快乐']
+    : ['Quiet Room', 'Really Like You'];
+
   let musicOpen = false;
+  let currentSong = 0;
+  let pendingPlay = false;
 
   // 隐藏提示
   setTimeout(() => { if (hint) hint.remove(); }, 4000);
@@ -1030,9 +1040,37 @@
       progress.style.width = (bgMusic.currentTime / bgMusic.duration * 100) + '%';
     }
   });
-  bgMusic.addEventListener('ended', () => { progress.style.width = '0%'; });
 
-  let pendingPlay = false;
+  bgMusic.addEventListener('ended', () => {
+    progress.style.width = '0%';
+    // 自动播放下一首
+    if (musicOpen) {
+      currentSong = (currentSong + 1) % PLAYLIST.length;
+      loadSong(currentSong);
+    }
+  });
+
+  bgMusic.addEventListener('error', () => {
+    // 跳过加载失败的歌曲
+    if (musicOpen) {
+      currentSong = (currentSong + 1) % PLAYLIST.length;
+      loadSong(currentSong);
+    }
+  });
+
+  function loadSong(index) {
+    bgMusic.src = PLAYLIST[index];
+    musicTitle.textContent = SONG_NAMES[index];
+    progress.style.width = '0%';
+    if (musicOpen) {
+      bgMusic.load();
+      bgMusic.play().then(() => {
+        control.classList.add('playing');
+        icon.textContent = '🎶';
+        status.textContent = '播放中';
+      }).catch(() => {});
+    }
+  }
 
   control.addEventListener('click', () => {
     musicOpen = !musicOpen;
@@ -1043,23 +1081,19 @@
           control.classList.add('playing');
           icon.textContent = '🎶';
           status.textContent = '播放中';
-        }).catch(err => { console.warn('play error:', err); status.textContent = '播放失败'; });
+        }).catch(() => { status.textContent = '播放失败'; });
       } else {
-        pendingPlay = true;
         bgMusic.addEventListener('canplay', () => {
-          if (pendingPlay) {
-            bgMusic.play().then(() => {
-              control.classList.add('playing');
-              icon.textContent = '🎶';
-              status.textContent = '播放中';
-            }).catch(err => { console.warn('play error:', err); status.textContent = '播放失败'; });
-            pendingPlay = false;
-          }
+          bgMusic.play().then(() => {
+            control.classList.add('playing');
+            icon.textContent = '🎶';
+            status.textContent = '播放中';
+          }).catch(() => { status.textContent = '播放失败'; });
         }, { once: true });
+        bgMusic.load();
       }
     } else {
       bgMusic.pause();
-      pendingPlay = false;
       control.classList.remove('playing');
       icon.textContent = '🎵';
       status.textContent = '已暂停';
