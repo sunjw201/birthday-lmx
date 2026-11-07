@@ -44,7 +44,13 @@
       justify-content: center;
       padding: 80px 1rem 2rem;
     }
-    html { scroll-behavior: smooth; }
+    /* 页面还能滚（滚轮/触屏），但不显示右侧滚动条 */
+    html {
+      scroll-behavior: smooth;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+    html::-webkit-scrollbar { display: none; }
 
 
     /* 🎵 音乐播放器 */
@@ -226,8 +232,10 @@
     }
 
     /* ❤️ 心形飘落 */
+    /* 用 fixed 而不是 absolute：absolute 元素做位移动画会撑大文档高度，
+       导致右侧滚动条一帧一变、一直闪 */
     .heart {
-      position: absolute;
+      position: fixed;
       font-size: 20px;
       animation: fall linear infinite;
       opacity: 0.7;
@@ -244,13 +252,6 @@
       text-align: center;
       padding: 2rem;
       z-index: 1;
-    }
-
-    .cake-emoji {
-      font-size: 80px;
-      animation: bounce 2s ease-in-out infinite;
-      display: block;
-      margin-bottom: 1rem;
     }
 
     @keyframes bounce {
@@ -464,85 +465,208 @@
       z-index: 50;
     }
 
-    /* 🎆 烟花 Canvas */
+    /* 🎆 烟花 Canvas：黑底全屏，盖在内容之上（弹窗 202/204 仍在它上面） */
     #fireworks {
       position: fixed;
       inset: 0;
-      z-index: 200;
+      z-index: 150;
       pointer-events: none;
       display: none;
+      background: #000;
     }
 
     #fireworks.active { display: block; }
 
-    /* 🕯️ 蜡烛点击区域 */
+    /* 🕯️ 蛋糕（纯 CSS 绘制，比 emoji 大得多，也方便让蜡烛真的"点着"） */
     .cake-wrapper {
       position: relative;
       display: inline-block;
       cursor: pointer;
-      margin-bottom: 1rem;
+      margin: 0 0 2.5rem;
+      -webkit-tap-highlight-color: transparent;
     }
 
-    .cake-wrapper:hover .cake-hint {
-      opacity: 1;
-    }
+    .cake-wrapper:hover .cake-hint { opacity: 1; }
 
     .cake-hint {
       position: absolute;
       bottom: -2rem;
       left: 50%;
       transform: translateX(-50%);
-      font-size: 0.7rem;
-      color: rgba(255, 215, 0, 0.7);
+      font-size: 0.75rem;
+      color: rgba(255, 215, 0, 0.8);
       white-space: nowrap;
       opacity: 0;
       transition: opacity 0.3s;
       pointer-events: none;
     }
 
-    .candle-wrap {
+    .cake {
+      /* 内部所有尺寸都用 em：改这里的 font-size 就能整体缩放 */
+      font-size: clamp(8px, 2.2vw, 11px);
+      position: relative;
+      width: 26em;
+      height: 28em;
+      margin: 0 auto;
+      animation: cakeFloat 4.5s ease-in-out infinite;
+      transition: filter 0.6s ease;
+    }
+
+    @keyframes cakeFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-0.5em); }
+    }
+
+    .cake-plate {
       position: absolute;
-      top: -10px;  /* 下移，更容易被看到 */
+      left: 50%;
+      bottom: 0;
+      transform: translateX(-50%);
+      width: 28em;
+      height: 2em;
+      border-radius: 50%;
+      background: linear-gradient(180deg, #f3eff8, #b6b1c9);
+      box-shadow: 0 0.8em 1.6em rgba(0, 0, 0, 0.45);
+    }
+
+    .cake-tier {
+      position: absolute;
       left: 50%;
       transform: translateX(-50%);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+      box-shadow: inset 0 -0.8em 1.2em rgba(150, 60, 90, 0.18);
+    }
+
+    .cake-tier-bottom {
+      bottom: 1.4em;
+      width: 24em;
+      height: 9.5em;
+      border-radius: 1.2em 1.2em 1.4em 1.4em;
+      background: linear-gradient(180deg, #ffd9c4 0%, #ffb9a8 45%, #f79ec0 100%);
+    }
+
+    .cake-tier-top {
+      bottom: 10.9em;
+      width: 18em;
+      height: 8em;
+      border-radius: 1.1em 1.1em 1.2em 1.2em;
+      background: linear-gradient(180deg, #ffe4d2 0%, #ffc4b4 45%, #f7a8c8 100%);
+    }
+
+    /* 奶油层 */
+    .frosting {
+      position: absolute;
+      top: -0.3em;
+      left: -0.2em;
+      right: -0.2em;
+      height: 2.8em;
+      background: linear-gradient(180deg, #fffdf8, #ffeede);
+      border-radius: 1.3em 1.3em 50% 50% / 1.3em 1.3em 22% 22%;
+      box-shadow: 0 0.3em 0.6em rgba(160, 80, 110, 0.15);
+    }
+
+    /* 小糖珠 */
+    .cake-tier-bottom::after {
+      content: '';
+      position: absolute;
+      left: 3.6em;
+      top: 4.8em;
+      width: 0.55em;
+      height: 0.55em;
+      border-radius: 50%;
+      background: #ff6b9d;
+      box-shadow:
+        3.2em -1em 0 #ffd700,
+        6.4em 0.8em 0 #7dd3fc,
+        9.4em -0.7em 0 #a78bfa,
+        12.4em 0.9em 0 #86efac,
+        15.2em -0.5em 0 #fca5a5;
+    }
+
+    /* 蜡烛 */
+    .candle-wrap {
+      position: absolute;
+      left: 50%;
+      bottom: 18.9em;
+      width: 1.6em;
+      height: 7em;
+      transform: translateX(-50%);
       z-index: 5;
+      pointer-events: none;
     }
 
     .candle {
-      font-size: 48px;  /* 放大蜡烛 */
-      position: relative;
-      display: inline-block;
-      transition: transform 0.2s;
-    }
-
-    .flame {
-      display: none;
-      font-size: 30px;  /* 放大火焰 */
       position: absolute;
-      top: -26px;
+      bottom: 0;
       left: 50%;
       transform: translateX(-50%);
-      transform-origin: bottom center;
-      animation: flicker 0.3s ease-in-out infinite alternate;
+      width: 1.5em;
+      height: 5.6em;
+      border-radius: 0.45em 0.45em 0.2em 0.2em;
+      background: repeating-linear-gradient(45deg, #ff6b9d 0 0.55em, #fff7f0 0.55em 1.1em);
+      box-shadow: inset -0.25em 0 0.4em rgba(150, 40, 80, 0.25), 0 0.2em 0.4em rgba(0, 0, 0, 0.2);
     }
 
-    .candle-wrap.lit .flame { display: block; }
+    .wick {
+      position: absolute;
+      bottom: 5.55em;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0.22em;
+      height: 0.85em;
+      border-radius: 0.1em;
+      background: #4a3b2a;
+    }
 
-    .candle-wrap.lit .candle {
-      animation: candleShake 0.2s ease-in-out infinite alternate;
+    /* 火焰：默认藏着，点着后弹出来并跳动 */
+    .flame {
+      position: absolute;
+      bottom: 6.1em;
+      left: 50%;
+      width: 1.7em;
+      height: 2.4em;
+      border-radius: 50% 50% 50% 50% / 62% 62% 38% 38%;
+      background: radial-gradient(circle at 50% 72%, #fffbe0 0%, #ffe066 38%, #ff9f1c 70%, #ff5e00 100%);
+      transform: translateX(-50%) scale(0.1);
+      transform-origin: bottom center;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      box-shadow: 0 0 1em rgba(255, 160, 40, 0.75);
+    }
+
+    .candle-glow {
+      position: absolute;
+      bottom: 3.4em;
+      left: 50%;
+      width: 11em;
+      height: 11em;
+      transform: translateX(-50%);
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255, 190, 90, 0.5) 0%, rgba(255, 140, 40, 0.18) 42%, transparent 70%);
+      opacity: 0;
+      transition: opacity 0.6s ease;
+      pointer-events: none;
+    }
+
+    .candle-wrap.lit .flame {
+      opacity: 1;
+      animation: flameIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both,
+                 flicker 0.28s 0.35s ease-in-out infinite alternate;
+    }
+
+    .candle-wrap.lit .candle-glow { opacity: 1; }
+
+    .cake-wrapper.lit .cake {
+      filter: drop-shadow(0 0 2.2em rgba(255, 170, 60, 0.45));
+    }
+
+    @keyframes flameIn {
+      0% { transform: translateX(-50%) scale(0.1); }
+      100% { transform: translateX(-50%) scale(1); }
     }
 
     @keyframes flicker {
-      0% { transform: translateX(-50%) scaleY(1) scaleX(1); }
-      100% { transform: translateX(-50%) scaleY(1.15) scaleX(0.9); }
-    }
-
-    @keyframes candleShake {
-      0% { transform: rotate(-2deg); }
-      100% { transform: rotate(2deg); }
+      0% { transform: translateX(-50%) scale(1, 1); }
+      100% { transform: translateX(-50%) scale(0.9, 1.14); }
     }
 
     /* 🎁 礼物盒 */
@@ -826,11 +950,6 @@
       .main-content { padding: 60px 0.8rem 1.5rem; }
       .container { padding: 0.8rem; }
 
-      .cake-emoji { font-size: 60px; }
-      .candle { font-size: 28px; }
-      .flame { font-size: 18px; }
-      .candle-wrap { top: -24px; }
-
       h1 { font-size: 2rem !important; }
 
       .date { font-size: 1rem !important; letter-spacing: 2px !important; }
@@ -882,7 +1001,8 @@
     /* 横屏手机 */
     @media (max-height: 500px) and (orientation: landscape) {
       .container { padding-top: 0.5rem; }
-      .cake-emoji { font-size: 50px; margin-bottom: 0.5rem; }
+      .cake { font-size: 6px; }
+      .cake-wrapper { margin-bottom: 1.6rem; }
       h1 { font-size: 1.8rem !important; margin-bottom: 0.3rem; }
       .divider { margin-bottom: 1rem; }
       .countdown { gap: 0.5rem; }
@@ -897,13 +1017,12 @@
 <div class="overlay">
   <div class="particles" id="particles"></div>
   <div id="balloons"></div>
-  <canvas id="fireworks"></canvas>
 </div>
 
 <!-- 音乐控件必须放在 .overlay 外面：
      .overlay 是 z-index:0 的独立层，里面的子元素再设 z-index 也压不过
      z-index:1 的 .main-content，会被透明的主内容挡住点击 -->
-<audio id="bgMusic" loop preload="metadata"></audio>
+<audio id="bgMusic" preload="metadata"></audio>
 <div class="music-control" id="musicControl" title="点击播放背景音乐">
   <div class="music-icon-wrap">
     <span class="music-icon" id="musicIcon">🎵</span>
@@ -923,6 +1042,9 @@
 </div>
 <div class="music-hint" id="musicHint">🎶 点击右上角播放背景音乐</div>
 
+<!-- 烟花画布同样要在 .overlay 外面，否则 z-index 出不了那一层，永远被内容盖住 -->
+<canvas id="fireworks"></canvas>
+
 <!-- 可滚动主内容 -->
 <div class="main-content">
 <div class="container">
@@ -941,11 +1063,17 @@
   <div id="birthday-normal">
     <!-- 🕯️ 点击蛋糕点蜡烛 -->
     <div class="cake-wrapper" id="cakeWrapper" onclick="lightCandle()">
-      <div class="candle-wrap" id="candleWrap">
-        <div class="flame">🔥</div>
-        <span class="candle">🕯️</span>
+      <div class="cake">
+        <div class="cake-plate"></div>
+        <div class="cake-tier cake-tier-bottom"><div class="frosting"></div></div>
+        <div class="cake-tier cake-tier-top"><div class="frosting"></div></div>
+        <div class="candle-wrap" id="candleWrap">
+          <div class="candle-glow"></div>
+          <div class="flame"></div>
+          <div class="wick"></div>
+          <div class="candle"></div>
+        </div>
       </div>
-      <span class="cake-emoji">🎂</span>
       <span class="cake-hint">点击点蜡烛 ❤️</span>
     </div>
     <h1>Happy Birthday, LMX</h1>
@@ -1024,17 +1152,13 @@
   const musicTitle = document.querySelector('.music-title');
   const bgMusic = document.getElementById('bgMusic');
 
-  const now = new Date();
-  const isBirthday = now.getMonth() === 10 && now.getDate() === 9;
-  const PLAYLIST = isBirthday
-    ? ['quiet-room.mp3', 'really-like-you.mp3', 'birthday-song.mp3']
-    : ['quiet-room.mp3', 'really-like-you.mp3'];
-  const SONG_NAMES = isBirthday
-    ? ['Quiet Room', 'Really Like You', '生日快乐']
-    : ['Quiet Room', 'Really Like You'];
+  // 三首歌按顺序循环播放
+  const PLAYLIST = ['quiet-room.mp3', 'really-like-you.mp3', 'birthday-song.mp3'];
+  const SONG_NAMES = ['Quiet Room', 'Really Like You', '生日快乐'];
 
   let musicOpen = false;
   let currentSong = 0;
+  let failedSongs = 0;
 
   // 隐藏提示
   setTimeout(() => { if (hint) hint.remove(); }, 4000);
@@ -1055,11 +1179,19 @@
   });
 
   bgMusic.addEventListener('error', () => {
-    // 跳过加载失败的歌曲
-    if (musicOpen) {
-      currentSong = (currentSong + 1) % PLAYLIST.length;
-      loadSong(currentSong);
+    // 跳过加载失败的歌曲；三首都失败就停下来，避免无限重试
+    if (!musicOpen) return;
+    failedSongs++;
+    if (failedSongs >= PLAYLIST.length) {
+      failedSongs = 0;
+      musicOpen = false;
+      control.classList.remove('playing');
+      icon.textContent = '🎵';
+      status.textContent = '播放失败';
+      return;
     }
+    currentSong = (currentSong + 1) % PLAYLIST.length;
+    loadSong(currentSong);
   });
 
   function loadSong(index) {
@@ -1069,6 +1201,7 @@
     if (musicOpen) {
       bgMusic.load();
       bgMusic.play().then(() => {
+        failedSongs = 0;
         control.classList.add('playing');
         icon.textContent = '🎶';
         status.textContent = '播放中';
@@ -1281,15 +1414,67 @@
 
   let candleLit = false;
 
+  // 点蜡烛后各环节的时间点（毫秒）
+  const MUSIC_DELAY_MS = 600;      // 多久之后开始唱歌
+  const FIREWORK_DELAY_MS = 2000;  // 多久之后开始放烟花
+
+  // 🎵 祝你生日快乐 — F 大调，简谱 5 5 6 5 1' 7 | 5 5 6 5 2' 1' | 5 5 5' 3 1' 7 6 | 4 4 3 1 2 1
+  // 每句最后的长音对应句尾的"乐 ~"
+  const BIRTHDAY_MELODY = [
+    // 祝你生日快乐（第一句）
+    { freq: 261.63, dur: 0.3 }, // C4  祝
+    { freq: 261.63, dur: 0.3 }, // C4  你
+    { freq: 293.66, dur: 0.6 }, // D4  生
+    { freq: 261.63, dur: 0.6 }, // C4  日
+    { freq: 349.23, dur: 0.6 }, // F4  快
+    { freq: 329.63, dur: 1.2 }, // E4  乐
+    // 祝你生日快乐（第二句）
+    { freq: 261.63, dur: 0.3 }, // C4  祝
+    { freq: 261.63, dur: 0.3 }, // C4  你
+    { freq: 293.66, dur: 0.6 }, // D4  生
+    { freq: 261.63, dur: 0.6 }, // C4  日
+    { freq: 392.00, dur: 0.6 }, // G4  快
+    { freq: 349.23, dur: 1.2 }, // F4  乐
+    // 祝你生日快乐（第三句，要拔高到高音 C5）
+    { freq: 261.63, dur: 0.3 }, // C4  祝
+    { freq: 261.63, dur: 0.3 }, // C4  你
+    { freq: 523.25, dur: 0.6 }, // C5  生（高八度，整首歌的最高音）
+    { freq: 440.00, dur: 0.6 }, // A4  日
+    { freq: 349.23, dur: 0.6 }, // F4  快
+    { freq: 329.63, dur: 0.6 }, // E4  乐
+    { freq: 293.66, dur: 1.2 }, // D4  ~
+    // 祝你生日快乐（第四句，落在主音 F 上收尾）
+    { freq: 466.16, dur: 0.3 }, // Bb4 祝
+    { freq: 466.16, dur: 0.3 }, // Bb4 你
+    { freq: 440.00, dur: 0.6 }, // A4  生
+    { freq: 349.23, dur: 0.6 }, // F4  日
+    { freq: 392.00, dur: 0.6 }, // G4  快
+    { freq: 349.23, dur: 1.5 }, // F4  乐 ~
+  ];
+  const BIRTHDAY_MS = BIRTHDAY_MELODY.reduce((sum, n) => sum + n.dur, 0) * 1000;
+
+  // 每句歌词第一个音的时间点（毫秒），烟花跟着乐句走
+  const PHRASE_START_MS = (() => {
+    const starts = [0];
+    let acc = 0;
+    BIRTHDAY_MELODY.forEach((n, i) => {
+      if (i === 6 || i === 12 || i === 19) starts.push(acc * 1000);
+      acc += n.dur;
+    });
+    return starts;
+  })();
+
   function lightCandle() {
     if (candleLit) return;
     candleLit = true;
 
     const candleWrap = document.getElementById('candleWrap');
+    const cakeWrapper = document.getElementById('cakeWrapper');
     const modal = document.getElementById('birthdayModal');
 
     // 1️⃣ 点燃蜡烛
     candleWrap.classList.add('lit');
+    cakeWrapper.classList.add('lit');
 
     // 2️⃣ 显示生日弹窗
     setTimeout(() => {
@@ -1297,15 +1482,15 @@
     }, 400);
 
     // 3️⃣ 播放生日快乐歌（用 Web Audio API 合成）
-    setTimeout(() => {
-      playHappyBirthday();
-    }, 600);
+    setTimeout(playHappyBirthday, MUSIC_DELAY_MS);
 
-    // 4️⃣ 放烟花
+    // 4️⃣ 放烟花：长度跟着生日歌唱完，每句开头炸一发
     setTimeout(() => {
       modal.classList.remove('show');
-      launchFireworks();
-    }, 2000);
+      const musicOffset = MUSIC_DELAY_MS - FIREWORK_DELAY_MS; // 开始时歌已经唱了多久（负值）
+      const duration = BIRTHDAY_MS + musicOffset + 900;        // 唱完再多放 0.9 秒收尾
+      launchFireworks(duration, musicOffset);
+    }, FIREWORK_DELAY_MS);
   }
 
   // 🎵 用 Web Audio API 合成《祝你生日快乐》
@@ -1313,42 +1498,8 @@
     try {
       const ctx = new (window.AudioContext || window.webkitAudioContext)();
 
-      // 祝你生日快乐 — F 大调，简谱 5 5 6 5 1' 7 | 5 5 6 5 2' 1' | 5 5 5' 3 1' 7 6 | 4 4 3 1 2 1
-      // 每句最后的长音对应句尾的"乐 ~"
-      const melody = [
-        // 祝你生日快乐（第一句）
-        { freq: 261.63, dur: 0.3 }, // C4  祝
-        { freq: 261.63, dur: 0.3 }, // C4  你
-        { freq: 293.66, dur: 0.6 }, // D4  生
-        { freq: 261.63, dur: 0.6 }, // C4  日
-        { freq: 349.23, dur: 0.6 }, // F4  快
-        { freq: 329.63, dur: 1.2 }, // E4  乐
-        // 祝你生日快乐（第二句）
-        { freq: 261.63, dur: 0.3 }, // C4  祝
-        { freq: 261.63, dur: 0.3 }, // C4  你
-        { freq: 293.66, dur: 0.6 }, // D4  生
-        { freq: 261.63, dur: 0.6 }, // C4  日
-        { freq: 392.00, dur: 0.6 }, // G4  快
-        { freq: 349.23, dur: 1.2 }, // F4  乐
-        // 祝你生日快乐（第三句，要拔高到高音 C5）
-        { freq: 261.63, dur: 0.3 }, // C4  祝
-        { freq: 261.63, dur: 0.3 }, // C4  你
-        { freq: 523.25, dur: 0.6 }, // C5  生（高八度，整首歌的最高音）
-        { freq: 440.00, dur: 0.6 }, // A4  日
-        { freq: 349.23, dur: 0.6 }, // F4  快
-        { freq: 329.63, dur: 0.6 }, // E4  乐
-        { freq: 293.66, dur: 1.2 }, // D4  ~
-        // 祝你生日快乐（第四句，落在主音 F 上收尾）
-        { freq: 466.16, dur: 0.3 }, // Bb4 祝
-        { freq: 466.16, dur: 0.3 }, // Bb4 你
-        { freq: 440.00, dur: 0.6 }, // A4  生
-        { freq: 349.23, dur: 0.6 }, // F4  日
-        { freq: 392.00, dur: 0.6 }, // G4  快
-        { freq: 349.23, dur: 1.5 }, // F4  乐 ~
-      ];
-
       let t = ctx.currentTime;
-      melody.forEach(note => {
+      BIRTHDAY_MELODY.forEach(note => {
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
         osc.type = 'sine';
@@ -1369,7 +1520,8 @@
   // 🎆 烟花效果
   let fireActive = false;
 
-  function launchFireworks() {
+  // durationMs：放多久；melodyOffsetMs：烟花开始时生日歌已经唱了多久（负值）
+  function launchFireworks(durationMs = 8000, melodyOffsetMs = -1400) {
     const canvas = document.getElementById('fireworks');
     const ctx = canvas.getContext('2d');
 
@@ -1454,7 +1606,12 @@
       animId = requestAnimationFrame(animate);
     }
 
-    // 连续放多轮烟花
+    const randomExplode = () => explode(
+      Math.random() * canvas.width * 0.8 + canvas.width * 0.1,
+      Math.random() * canvas.height * 0.5 + canvas.height * 0.05
+    );
+
+    // 开场连续几发
     explode(canvas.width / 2, canvas.height * 0.3);
     setTimeout(() => explode(canvas.width * 0.3, canvas.height * 0.2), 400);
     setTimeout(() => explode(canvas.width * 0.7, canvas.height * 0.25), 800);
@@ -1462,9 +1619,15 @@
     setTimeout(() => explode(canvas.width * 0.2, canvas.height * 0.3), 1600);
     setTimeout(() => explode(canvas.width * 0.8, canvas.height * 0.2), 2000);
 
+    // 跟着歌词的乐句炸：每句开头来一发
+    PHRASE_START_MS.forEach(start => {
+      const rel = start + melodyOffsetMs;
+      if (rel > 0 && rel < durationMs) setTimeout(randomExplode, rel);
+    });
+
     animate();
 
-    // 烟花持续8秒后关闭
+    // 一直放到生日歌唱完（时长由旋律总长算出来）
     setTimeout(() => {
       cancelAnimationFrame(animId);
       canvas.classList.remove('active');
@@ -1472,8 +1635,9 @@
       fireActive = false;
       candleLit = false;
       document.getElementById('candleWrap').classList.remove('lit');
+      document.getElementById('cakeWrapper').classList.remove('lit');
       document.getElementById('birthdayModal').classList.remove('show');
-    }, 8000);
+    }, durationMs);
   }
 
   // 💌 信件弹窗
