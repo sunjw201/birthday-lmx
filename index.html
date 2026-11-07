@@ -502,171 +502,52 @@
     }
 
     .cake {
-      /* 内部所有尺寸都用 em：改这里的 font-size 就能整体缩放 */
-      font-size: clamp(8px, 2.2vw, 11px);
-      position: relative;
-      width: 26em;
-      height: 28em;
+      width: min(280px, 34vh);
       margin: 0 auto;
       animation: cakeFloat 4.5s ease-in-out infinite;
+      filter: drop-shadow(0 14px 18px rgba(0, 0, 0, 0.35));
       transition: filter 0.6s ease;
     }
 
+    .cake svg { display: block; width: 100%; height: auto; }
+
     @keyframes cakeFloat {
       0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-0.5em); }
-    }
-
-    .cake-plate {
-      position: absolute;
-      left: 50%;
-      bottom: 0;
-      transform: translateX(-50%);
-      width: 28em;
-      height: 2em;
-      border-radius: 50%;
-      background: linear-gradient(180deg, #f3eff8, #b6b1c9);
-      box-shadow: 0 0.8em 1.6em rgba(0, 0, 0, 0.45);
-    }
-
-    .cake-tier {
-      position: absolute;
-      left: 50%;
-      transform: translateX(-50%);
-      box-shadow: inset 0 -0.8em 1.2em rgba(150, 60, 90, 0.18);
-    }
-
-    .cake-tier-bottom {
-      bottom: 1.4em;
-      width: 24em;
-      height: 9.5em;
-      border-radius: 1.2em 1.2em 1.4em 1.4em;
-      background: linear-gradient(180deg, #ffd9c4 0%, #ffb9a8 45%, #f79ec0 100%);
-    }
-
-    .cake-tier-top {
-      bottom: 10.9em;
-      width: 18em;
-      height: 8em;
-      border-radius: 1.1em 1.1em 1.2em 1.2em;
-      background: linear-gradient(180deg, #ffe4d2 0%, #ffc4b4 45%, #f7a8c8 100%);
-    }
-
-    /* 奶油层 */
-    .frosting {
-      position: absolute;
-      top: -0.3em;
-      left: -0.2em;
-      right: -0.2em;
-      height: 2.8em;
-      background: linear-gradient(180deg, #fffdf8, #ffeede);
-      border-radius: 1.3em 1.3em 50% 50% / 1.3em 1.3em 22% 22%;
-      box-shadow: 0 0.3em 0.6em rgba(160, 80, 110, 0.15);
-    }
-
-    /* 小糖珠 */
-    .cake-tier-bottom::after {
-      content: '';
-      position: absolute;
-      left: 3.6em;
-      top: 4.8em;
-      width: 0.55em;
-      height: 0.55em;
-      border-radius: 50%;
-      background: #ff6b9d;
-      box-shadow:
-        3.2em -1em 0 #ffd700,
-        6.4em 0.8em 0 #7dd3fc,
-        9.4em -0.7em 0 #a78bfa,
-        12.4em 0.9em 0 #86efac,
-        15.2em -0.5em 0 #fca5a5;
-    }
-
-    /* 蜡烛 */
-    .candle-wrap {
-      position: absolute;
-      left: 50%;
-      bottom: 18.9em;
-      width: 1.6em;
-      height: 7em;
-      transform: translateX(-50%);
-      z-index: 5;
-      pointer-events: none;
-    }
-
-    .candle {
-      position: absolute;
-      bottom: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 1.5em;
-      height: 5.6em;
-      border-radius: 0.45em 0.45em 0.2em 0.2em;
-      background: repeating-linear-gradient(45deg, #ff6b9d 0 0.55em, #fff7f0 0.55em 1.1em);
-      box-shadow: inset -0.25em 0 0.4em rgba(150, 40, 80, 0.25), 0 0.2em 0.4em rgba(0, 0, 0, 0.2);
-    }
-
-    .wick {
-      position: absolute;
-      bottom: 5.55em;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 0.22em;
-      height: 0.85em;
-      border-radius: 0.1em;
-      background: #4a3b2a;
+      50% { transform: translateY(-6px); }
     }
 
     /* 火焰：默认藏着，点着后弹出来并跳动 */
-    .flame {
-      position: absolute;
-      bottom: 6.1em;
-      left: 50%;
-      width: 1.7em;
-      height: 2.4em;
-      border-radius: 50% 50% 50% 50% / 62% 62% 38% 38%;
-      background: radial-gradient(circle at 50% 72%, #fffbe0 0%, #ffe066 38%, #ff9f1c 70%, #ff5e00 100%);
-      transform: translateX(-50%) scale(0.1);
-      transform-origin: bottom center;
+    .cake .flame {
       opacity: 0;
+      transform: scale(0.2);
+      transform-box: fill-box;
+      transform-origin: 50% 100%;
       transition: opacity 0.3s ease;
-      box-shadow: 0 0 1em rgba(255, 160, 40, 0.75);
     }
 
-    .candle-glow {
-      position: absolute;
-      bottom: 3.4em;
-      left: 50%;
-      width: 11em;
-      height: 11em;
-      transform: translateX(-50%);
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(255, 190, 90, 0.5) 0%, rgba(255, 140, 40, 0.18) 42%, transparent 70%);
-      opacity: 0;
-      transition: opacity 0.6s ease;
-      pointer-events: none;
-    }
+    .cake .candle-glow { opacity: 0; transition: opacity 0.6s ease; }
 
-    .candle-wrap.lit .flame {
+    .cake-wrapper.lit .candle-glow { opacity: 1; }
+
+    .cake-wrapper.lit .flame {
       opacity: 1;
       animation: flameIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both,
                  flicker 0.28s 0.35s ease-in-out infinite alternate;
     }
 
-    .candle-wrap.lit .candle-glow { opacity: 1; }
-
     .cake-wrapper.lit .cake {
-      filter: drop-shadow(0 0 2.2em rgba(255, 170, 60, 0.45));
+      filter: drop-shadow(0 14px 18px rgba(0, 0, 0, 0.35))
+              drop-shadow(0 0 26px rgba(255, 170, 60, 0.5));
     }
 
     @keyframes flameIn {
-      0% { transform: translateX(-50%) scale(0.1); }
-      100% { transform: translateX(-50%) scale(1); }
+      0% { transform: scale(0.2); }
+      100% { transform: scale(1); }
     }
 
     @keyframes flicker {
-      0% { transform: translateX(-50%) scale(1, 1); }
-      100% { transform: translateX(-50%) scale(0.9, 1.14); }
+      0% { transform: scale(1, 1); }
+      100% { transform: scale(0.9, 1.1); }
     }
 
     /* 🎁 礼物盒 */
@@ -762,22 +643,32 @@
     }
     #letterCloseBtn {
       position: absolute;
-      top: -0.5rem;
-      right: -0.5rem;
-      background: rgba(200, 150, 100, 0.15);
-      border: 1.5px solid #e8d4b8;
-      border-radius: 50%;
-      width: 32px;
-      height: 32px;
-      font-size: 1rem;
-      color: #8B4513;
-      cursor: pointer;
+      top: 0.85rem;
+      right: 0.85rem;
+      width: 34px;
+      height: 34px;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: background 0.2s;
+      padding: 0;
+      background: linear-gradient(135deg, #fff7ea, #ffe8cf);
+      border: 1px solid rgba(200, 150, 100, 0.35);
+      border-radius: 50%;
+      font-size: 0.95rem;
+      line-height: 1;
+      color: #b5731f;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(180, 120, 60, 0.18);
+      transition: transform 0.25s ease, background 0.25s ease, color 0.25s ease, box-shadow 0.25s ease;
     }
-    #letterCloseBtn:hover { background: rgba(200, 150, 100, 0.3); }
+    #letterCloseBtn:hover {
+      background: linear-gradient(135deg, #ff6b9d, #ff9ecf);
+      border-color: transparent;
+      color: #fff;
+      transform: rotate(90deg) scale(1.08);
+      box-shadow: 0 4px 14px rgba(255, 107, 157, 0.45);
+    }
+    #letterCloseBtn:active { transform: rotate(90deg) scale(0.95); }
 
     .letter-emoji {
       font-size: 2.5rem;
@@ -950,6 +841,8 @@
       .main-content { padding: 60px 0.8rem 1.5rem; }
       .container { padding: 0.8rem; }
 
+      .cake { width: min(240px, 64vw); }
+
       h1 { font-size: 2rem !important; }
 
       .date { font-size: 1rem !important; letter-spacing: 2px !important; }
@@ -1001,7 +894,7 @@
     /* 横屏手机 */
     @media (max-height: 500px) and (orientation: landscape) {
       .container { padding-top: 0.5rem; }
-      .cake { font-size: 6px; }
+      .cake { width: min(190px, 44vh); }
       .cake-wrapper { margin-bottom: 1.6rem; }
       h1 { font-size: 1.8rem !important; margin-bottom: 0.3rem; }
       .divider { margin-bottom: 1rem; }
@@ -1064,15 +957,88 @@
     <!-- 🕯️ 点击蛋糕点蜡烛 -->
     <div class="cake-wrapper" id="cakeWrapper" onclick="lightCandle()">
       <div class="cake">
-        <div class="cake-plate"></div>
-        <div class="cake-tier cake-tier-bottom"><div class="frosting"></div></div>
-        <div class="cake-tier cake-tier-top"><div class="frosting"></div></div>
-        <div class="candle-wrap" id="candleWrap">
-          <div class="candle-glow"></div>
-          <div class="flame"></div>
-          <div class="wick"></div>
-          <div class="candle"></div>
-        </div>
+        <svg viewBox="0 0 240 290" role="img" aria-label="生日蛋糕">
+          <defs>
+            <linearGradient id="plateGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#f6f3fa"/><stop offset="1" stop-color="#c4bed6"/>
+            </linearGradient>
+            <linearGradient id="cakeGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#ffdcea"/>
+              <stop offset="0.55" stop-color="#ffb6d2"/>
+              <stop offset="1" stop-color="#ff8fbb"/>
+            </linearGradient>
+            <linearGradient id="cherryGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#ff7b8f"/><stop offset="1" stop-color="#e2334d"/>
+            </linearGradient>
+            <radialGradient id="flameGrad" cx="0.5" cy="0.72" r="0.62">
+              <stop offset="0" stop-color="#fffbd0"/>
+              <stop offset="0.45" stop-color="#ffd93d"/>
+              <stop offset="0.78" stop-color="#ff9f1c"/>
+              <stop offset="1" stop-color="#ff6a00"/>
+            </radialGradient>
+            <radialGradient id="glowGrad">
+              <stop offset="0" stop-color="#ffc45a" stop-opacity="0.55"/>
+              <stop offset="0.45" stop-color="#ff9632" stop-opacity="0.22"/>
+              <stop offset="1" stop-color="#ff8c28" stop-opacity="0"/>
+            </radialGradient>
+            <pattern id="stripe" width="12" height="12" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+              <rect width="12" height="12" fill="#fff7f0"/>
+              <rect width="6" height="12" fill="#ff8fb1"/>
+            </pattern>
+          </defs>
+
+          <!-- 盘子 -->
+          <ellipse cx="120" cy="274" rx="106" ry="12" fill="url(#plateGrad)"/>
+
+          <!-- 蛋糕主体 + 高光 -->
+          <rect x="30" y="152" width="180" height="110" rx="22" fill="url(#cakeGrad)"/>
+          <rect x="44" y="164" width="22" height="86" rx="11" fill="#fff" opacity="0.14"/>
+
+          <!-- 奶油和滴落 -->
+          <rect x="24" y="140" width="192" height="38" rx="19" fill="#fffaf4"/>
+          <circle cx="48" cy="179" r="15" fill="#fffaf4"/>
+          <circle cx="84" cy="176" r="11" fill="#fffaf4"/>
+          <circle cx="120" cy="181" r="16" fill="#fffaf4"/>
+          <circle cx="156" cy="176" r="11" fill="#fffaf4"/>
+          <circle cx="192" cy="179" r="15" fill="#fffaf4"/>
+
+          <!-- 糖珠 -->
+          <rect x="52" y="196" width="12" height="4.5" rx="2.2" fill="#7dd3fc" transform="rotate(-20 58 198)"/>
+          <rect x="176" y="198" width="12" height="4.5" rx="2.2" fill="#ffd166" transform="rotate(20 182 200)"/>
+          <rect x="50" y="236" width="12" height="4.5" rx="2.2" fill="#a78bfa" transform="rotate(15 56 238)"/>
+          <rect x="178" y="234" width="12" height="4.5" rx="2.2" fill="#86efac" transform="rotate(-15 184 236)"/>
+          <circle cx="68" cy="258" r="3" fill="#ff8fb1"/>
+          <circle cx="172" cy="256" r="3" fill="#ffd166"/>
+          <circle cx="120" cy="252" r="2.6" fill="#a78bfa"/>
+
+          <!-- 可爱表情 -->
+          <ellipse cx="90" cy="216" rx="6" ry="8" fill="#5b3a2e"/>
+          <ellipse cx="150" cy="216" rx="6" ry="8" fill="#5b3a2e"/>
+          <circle cx="88" cy="212" r="2" fill="#fff" opacity="0.9"/>
+          <circle cx="148" cy="212" r="2" fill="#fff" opacity="0.9"/>
+          <ellipse cx="66" cy="232" rx="13" ry="7.5" fill="#ff8fb1" opacity="0.45"/>
+          <ellipse cx="174" cy="232" rx="13" ry="7.5" fill="#ff8fb1" opacity="0.45"/>
+          <path d="M108 231 Q120 245 132 231" fill="none" stroke="#5b3a2e" stroke-width="4" stroke-linecap="round"/>
+
+          <!-- 樱桃 -->
+          <circle cx="86" cy="133" r="10" fill="url(#cherryGrad)"/>
+          <circle cx="82" cy="129" r="2.6" fill="#fff" opacity="0.75"/>
+          <path d="M86 123 q 3 -9 11 -11" fill="none" stroke="#4f8a4f" stroke-width="3" stroke-linecap="round"/>
+          <circle cx="154" cy="133" r="10" fill="url(#cherryGrad)"/>
+          <circle cx="150" cy="129" r="2.6" fill="#fff" opacity="0.75"/>
+          <path d="M154 123 q 3 -9 11 -11" fill="none" stroke="#4f8a4f" stroke-width="3" stroke-linecap="round"/>
+
+          <!-- 蜡烛 -->
+          <rect x="113" y="80" width="14" height="74" rx="5" fill="url(#stripe)"/>
+          <rect x="118.5" y="71" width="3" height="10" rx="1.5" fill="#6b4a2f"/>
+
+          <!-- 火光：默认藏着，点着后出现 -->
+          <circle class="candle-glow" cx="120" cy="66" r="42" fill="url(#glowGrad)"/>
+          <g class="flame">
+            <path d="M120 40 C 129 52 133 60 133 67 C 133 76 127 82 120 82 C 113 82 107 76 107 67 C 107 60 111 52 120 40 Z" fill="url(#flameGrad)"/>
+            <path d="M120 55 C 124 61 126 65 126 68.5 C 126 73 123 76 120 76 C 117 76 114 73 114 68.5 C 114 65 116 61 120 55 Z" fill="#fff6b8" opacity="0.95"/>
+          </g>
+        </svg>
       </div>
       <span class="cake-hint">点击点蜡烛 ❤️</span>
     </div>
@@ -1350,12 +1316,12 @@
     setTimeout(() => el.remove(), (duration + 2) * 1000);
   }
 
-  // 错开启动时间，歌词陆续入场
-  LYRICS.forEach((_, i) => {
-    setTimeout(createLyric, i * 2000);
+  // 开场先飘 6 句，错开入场
+  LYRICS.slice(0, 6).forEach((_, i) => {
+    setTimeout(createLyric, i * 1200);
   });
-  // 之后每4秒飘入一条
-  setInterval(createLyric, 4000);
+  // 之后每 2.4 秒飘入一条，屏幕上保持 7 句左右
+  setInterval(createLyric, 2400);
 
   // 🎇 生日当天的彩带
   function createConfetti() {
@@ -1414,9 +1380,8 @@
 
   let candleLit = false;
 
-  // 点蜡烛后各环节的时间点（毫秒）
-  const MUSIC_DELAY_MS = 600;      // 多久之后开始唱歌
-  const FIREWORK_DELAY_MS = 2000;  // 多久之后开始放烟花
+  // 点蜡烛后先展示多久的生日弹窗（毫秒）；弹窗结束后歌和烟花一起开始
+  const INTRO_MS = 2000;
 
   // 🎵 祝你生日快乐 — F 大调，简谱 5 5 6 5 1' 7 | 5 5 6 5 2' 1' | 5 5 5' 3 1' 7 6 | 4 4 3 1 2 1
   // 每句最后的长音对应句尾的"乐 ~"
@@ -1468,12 +1433,10 @@
     if (candleLit) return;
     candleLit = true;
 
-    const candleWrap = document.getElementById('candleWrap');
     const cakeWrapper = document.getElementById('cakeWrapper');
     const modal = document.getElementById('birthdayModal');
 
     // 1️⃣ 点燃蜡烛
-    candleWrap.classList.add('lit');
     cakeWrapper.classList.add('lit');
 
     // 2️⃣ 显示生日弹窗
@@ -1481,16 +1444,13 @@
       modal.classList.add('show');
     }, 400);
 
-    // 3️⃣ 播放生日快乐歌（用 Web Audio API 合成）
-    setTimeout(playHappyBirthday, MUSIC_DELAY_MS);
-
-    // 4️⃣ 放烟花：长度跟着生日歌唱完，每句开头炸一发
+    // 3️⃣ 弹窗收起的同时开始唱歌 + 放烟花
+    //    两件事在同一个回调里触发，第一句歌词和第一朵烟花同一帧开始
     setTimeout(() => {
       modal.classList.remove('show');
-      const musicOffset = MUSIC_DELAY_MS - FIREWORK_DELAY_MS; // 开始时歌已经唱了多久（负值）
-      const duration = BIRTHDAY_MS + musicOffset + 900;        // 唱完再多放 0.9 秒收尾
-      launchFireworks(duration, musicOffset);
-    }, FIREWORK_DELAY_MS);
+      playHappyBirthday();
+      launchFireworks(BIRTHDAY_MS + 900, 0);
+    }, INTRO_MS);
   }
 
   // 🎵 用 Web Audio API 合成《祝你生日快乐》
@@ -1634,7 +1594,6 @@
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       fireActive = false;
       candleLit = false;
-      document.getElementById('candleWrap').classList.remove('lit');
       document.getElementById('cakeWrapper').classList.remove('lit');
       document.getElementById('birthdayModal').classList.remove('show');
     }, durationMs);
@@ -1709,9 +1668,12 @@
 
     fetch('https://api.web3forms.com/submit', {
       method: 'POST',
+      headers: { Accept: 'application/json' },
       body: formData
     }).then(res => res.json()).then(data => {
-      if (data.status === 'success') {
+      // Web3Forms 成功时返回的是 { success: true, message: "..." }
+      // 原来判断的 data.status 永远是 undefined，所以邮件寄出去了也一直提示失败
+      if (data.success === true) {
         btn.textContent = '已寄出 ✨';
         setTimeout(() => {
           btn.textContent = '封好信 💕';
