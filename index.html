@@ -477,12 +477,12 @@
 
     #fireworks.active { display: block; }
 
-    /* 🕯️ 蛋糕（纯 CSS 绘制，比 emoji 大得多，也方便让蜡烛真的"点着"） */
+    /* 🕯️ 蛋糕（第一版 emoji 蛋糕，整体放大） */
     .cake-wrapper {
       position: relative;
       display: inline-block;
       cursor: pointer;
-      margin: 0 0 2.5rem;
+      margin: 0 0 3.2rem;
       -webkit-tap-highlight-color: transparent;
     }
 
@@ -501,53 +501,66 @@
       pointer-events: none;
     }
 
-    .cake {
-      width: min(280px, 34vh);
-      margin: 0 auto;
-      animation: cakeFloat 4.5s ease-in-out infinite;
-      filter: drop-shadow(0 14px 18px rgba(0, 0, 0, 0.35));
+    .cake-emoji {
+      display: block;
+      font-size: 124px;
+      line-height: 1;
+      animation: bounce 2.4s ease-in-out infinite;
+      filter: drop-shadow(0 16px 22px rgba(0, 0, 0, 0.35));
       transition: filter 0.6s ease;
     }
 
-    .cake svg { display: block; width: 100%; height: auto; }
-
-    @keyframes cakeFloat {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-6px); }
+    .candle-wrap {
+      position: absolute;
+      top: -18px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      z-index: 5;
     }
 
-    /* 火焰：默认藏着，点着后弹出来并跳动 */
-    .cake .flame {
-      opacity: 0;
-      transform: scale(0.2);
-      transform-box: fill-box;
-      transform-origin: 50% 100%;
-      transition: opacity 0.3s ease;
+    .candle {
+      display: inline-block;
+      position: relative;
+      font-size: 70px;
+      line-height: 1;
+      transition: transform 0.2s;
     }
 
-    .cake .candle-glow { opacity: 0; transition: opacity 0.6s ease; }
-
-    .cake-wrapper.lit .candle-glow { opacity: 1; }
-
-    .cake-wrapper.lit .flame {
-      opacity: 1;
-      animation: flameIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both,
-                 flicker 0.28s 0.35s ease-in-out infinite alternate;
+    /* 火焰：点着后出现并跳动 */
+    .flame {
+      display: none;
+      position: absolute;
+      top: -40px;
+      left: 50%;
+      font-size: 44px;
+      line-height: 1;
+      transform: translateX(-50%);
+      transform-origin: bottom center;
+      animation: flicker 0.3s ease-in-out infinite alternate;
     }
 
-    .cake-wrapper.lit .cake {
-      filter: drop-shadow(0 14px 18px rgba(0, 0, 0, 0.35))
-              drop-shadow(0 0 26px rgba(255, 170, 60, 0.5));
+    .cake-wrapper.lit .flame { display: block; }
+
+    .cake-wrapper.lit .candle {
+      animation: candleShake 0.2s ease-in-out infinite alternate;
     }
 
-    @keyframes flameIn {
-      0% { transform: scale(0.2); }
-      100% { transform: scale(1); }
+    .cake-wrapper.lit .cake-emoji {
+      filter: drop-shadow(0 16px 22px rgba(0, 0, 0, 0.35))
+              drop-shadow(0 0 30px rgba(255, 170, 60, 0.55));
     }
 
     @keyframes flicker {
-      0% { transform: scale(1, 1); }
-      100% { transform: scale(0.9, 1.1); }
+      0% { transform: translateX(-50%) scaleY(1) scaleX(1); }
+      100% { transform: translateX(-50%) scaleY(1.15) scaleX(0.9); }
+    }
+
+    @keyframes candleShake {
+      0% { transform: rotate(-2deg); }
+      100% { transform: rotate(2deg); }
     }
 
     /* 🎁 礼物盒 */
@@ -841,7 +854,10 @@
       .main-content { padding: 60px 0.8rem 1.5rem; }
       .container { padding: 0.8rem; }
 
-      .cake { width: min(240px, 64vw); }
+      .cake-emoji { font-size: min(104px, 28vw); }
+      .candle { font-size: min(58px, 16vw); }
+      .flame { font-size: min(38px, 11vw); top: -33px; }
+      .candle-wrap { top: -15px; }
 
       h1 { font-size: 2rem !important; }
 
@@ -894,7 +910,10 @@
     /* 横屏手机 */
     @media (max-height: 500px) and (orientation: landscape) {
       .container { padding-top: 0.5rem; }
-      .cake { width: min(190px, 44vh); }
+      .cake-emoji { font-size: min(88px, 22vh); }
+      .candle { font-size: min(50px, 12vh); }
+      .flame { font-size: min(32px, 8vh); top: -29px; }
+      .candle-wrap { top: -13px; }
       .cake-wrapper { margin-bottom: 1.6rem; }
       h1 { font-size: 1.8rem !important; margin-bottom: 0.3rem; }
       .divider { margin-bottom: 1rem; }
@@ -944,8 +963,8 @@
   <div class="birthday-active">
     <h2 class="wish-title">🎊 生日快乐！🎊</h2>
     <p class="wish-text">
-      亲爱的 LMX，今天是属于你的特别日子
-      愿你永远被爱包围
+      亲爱的 LMX，今天是属于你的特别日子<br>
+      愿你永远被爱包围<br>
       愿你永远闪闪发光 ✨<br>
       愿你所有的期待都能如愿<br>
       愿你被这世界温柔以待<br>
@@ -956,94 +975,15 @@
   <div id="birthday-normal">
     <!-- 🕯️ 点击蛋糕点蜡烛 -->
     <div class="cake-wrapper" id="cakeWrapper" onclick="lightCandle()">
-      <div class="cake">
-        <svg viewBox="0 0 240 290" role="img" aria-label="生日蛋糕">
-          <defs>
-            <linearGradient id="plateGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0" stop-color="#f6f3fa"/><stop offset="1" stop-color="#c4bed6"/>
-            </linearGradient>
-            <linearGradient id="cakeGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0" stop-color="#ffdcea"/>
-              <stop offset="0.55" stop-color="#ffb6d2"/>
-              <stop offset="1" stop-color="#ff8fbb"/>
-            </linearGradient>
-            <linearGradient id="cherryGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0" stop-color="#ff7b8f"/><stop offset="1" stop-color="#e2334d"/>
-            </linearGradient>
-            <radialGradient id="flameGrad" cx="0.5" cy="0.72" r="0.62">
-              <stop offset="0" stop-color="#fffbd0"/>
-              <stop offset="0.45" stop-color="#ffd93d"/>
-              <stop offset="0.78" stop-color="#ff9f1c"/>
-              <stop offset="1" stop-color="#ff6a00"/>
-            </radialGradient>
-            <radialGradient id="glowGrad">
-              <stop offset="0" stop-color="#ffc45a" stop-opacity="0.55"/>
-              <stop offset="0.45" stop-color="#ff9632" stop-opacity="0.22"/>
-              <stop offset="1" stop-color="#ff8c28" stop-opacity="0"/>
-            </radialGradient>
-            <pattern id="stripe" width="12" height="12" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-              <rect width="12" height="12" fill="#fff7f0"/>
-              <rect width="6" height="12" fill="#ff8fb1"/>
-            </pattern>
-          </defs>
-
-          <!-- 盘子 -->
-          <ellipse cx="120" cy="274" rx="106" ry="12" fill="url(#plateGrad)"/>
-
-          <!-- 蛋糕主体 + 高光 -->
-          <rect x="30" y="152" width="180" height="110" rx="22" fill="url(#cakeGrad)"/>
-          <rect x="44" y="164" width="22" height="86" rx="11" fill="#fff" opacity="0.14"/>
-
-          <!-- 奶油和滴落 -->
-          <rect x="24" y="140" width="192" height="38" rx="19" fill="#fffaf4"/>
-          <circle cx="48" cy="179" r="15" fill="#fffaf4"/>
-          <circle cx="84" cy="176" r="11" fill="#fffaf4"/>
-          <circle cx="120" cy="181" r="16" fill="#fffaf4"/>
-          <circle cx="156" cy="176" r="11" fill="#fffaf4"/>
-          <circle cx="192" cy="179" r="15" fill="#fffaf4"/>
-
-          <!-- 糖珠 -->
-          <rect x="52" y="196" width="12" height="4.5" rx="2.2" fill="#7dd3fc" transform="rotate(-20 58 198)"/>
-          <rect x="176" y="198" width="12" height="4.5" rx="2.2" fill="#ffd166" transform="rotate(20 182 200)"/>
-          <rect x="50" y="236" width="12" height="4.5" rx="2.2" fill="#a78bfa" transform="rotate(15 56 238)"/>
-          <rect x="178" y="234" width="12" height="4.5" rx="2.2" fill="#86efac" transform="rotate(-15 184 236)"/>
-          <circle cx="68" cy="258" r="3" fill="#ff8fb1"/>
-          <circle cx="172" cy="256" r="3" fill="#ffd166"/>
-          <circle cx="120" cy="252" r="2.6" fill="#a78bfa"/>
-
-          <!-- 可爱表情 -->
-          <ellipse cx="90" cy="216" rx="6" ry="8" fill="#5b3a2e"/>
-          <ellipse cx="150" cy="216" rx="6" ry="8" fill="#5b3a2e"/>
-          <circle cx="88" cy="212" r="2" fill="#fff" opacity="0.9"/>
-          <circle cx="148" cy="212" r="2" fill="#fff" opacity="0.9"/>
-          <ellipse cx="66" cy="232" rx="13" ry="7.5" fill="#ff8fb1" opacity="0.45"/>
-          <ellipse cx="174" cy="232" rx="13" ry="7.5" fill="#ff8fb1" opacity="0.45"/>
-          <path d="M108 231 Q120 245 132 231" fill="none" stroke="#5b3a2e" stroke-width="4" stroke-linecap="round"/>
-
-          <!-- 樱桃 -->
-          <circle cx="86" cy="133" r="10" fill="url(#cherryGrad)"/>
-          <circle cx="82" cy="129" r="2.6" fill="#fff" opacity="0.75"/>
-          <path d="M86 123 q 3 -9 11 -11" fill="none" stroke="#4f8a4f" stroke-width="3" stroke-linecap="round"/>
-          <circle cx="154" cy="133" r="10" fill="url(#cherryGrad)"/>
-          <circle cx="150" cy="129" r="2.6" fill="#fff" opacity="0.75"/>
-          <path d="M154 123 q 3 -9 11 -11" fill="none" stroke="#4f8a4f" stroke-width="3" stroke-linecap="round"/>
-
-          <!-- 蜡烛 -->
-          <rect x="113" y="80" width="14" height="74" rx="5" fill="url(#stripe)"/>
-          <rect x="118.5" y="71" width="3" height="10" rx="1.5" fill="#6b4a2f"/>
-
-          <!-- 火光：默认藏着，点着后出现 -->
-          <circle class="candle-glow" cx="120" cy="66" r="42" fill="url(#glowGrad)"/>
-          <g class="flame">
-            <path d="M120 40 C 129 52 133 60 133 67 C 133 76 127 82 120 82 C 113 82 107 76 107 67 C 107 60 111 52 120 40 Z" fill="url(#flameGrad)"/>
-            <path d="M120 55 C 124 61 126 65 126 68.5 C 126 73 123 76 120 76 C 117 76 114 73 114 68.5 C 114 65 116 61 120 55 Z" fill="#fff6b8" opacity="0.95"/>
-          </g>
-        </svg>
+      <div class="candle-wrap" id="candleWrap">
+        <div class="flame">🔥</div>
+        <span class="candle">🕯️</span>
       </div>
+      <span class="cake-emoji">🎂</span>
       <span class="cake-hint">点击点蜡烛 ❤️</span>
     </div>
     <h1>Happy Birthday, LMX</h1>
-    <p class="date">11 月 09 日</p>
+    <p class="date">11 月 07 日</p>
     <div class="divider"></div>
 
     <p class="countdown-label">⏳ 距离生日还有</p>
@@ -1104,7 +1044,7 @@
   <div class="modal-emojis">🎂🎉🎁</div>
   <div class="modal-title">祝你生日快乐～</div>
   <div class="modal-name">🎀 LMX 🎀</div>
-  <div class="modal-sub">11 月 09 日 · 属于你的特别日子</div>
+  <div class="modal-sub">11 月 07 日 · 属于你的特别日子</div>
   <div class="modal-emojis">🎈🎊✨</div>
 </div>
 
@@ -1338,22 +1278,29 @@
   function getNextBirthday() {
     const now = new Date();
     let year = now.getFullYear();
-    const birthday = new Date(year, 10, 9); // 11月9日，月份从0开始
+    const birthday = new Date(year, 10, 7); // 11月7日，月份从0开始（预览用，正式是 11月9日）
     if (now > birthday) birthday.setFullYear(year + 1);
     return birthday;
   }
+
+  let birthdayStarted = false;
 
   function updateCountdown() {
     const target = getNextBirthday();
     const now = new Date();
     const diff = target - now;
 
-    const isBirthday = now.getMonth() === 10 && now.getDate() === 9;
+    const isBirthday = now.getMonth() === 10 && now.getDate() === 7;
 
     if (isBirthday) {
       document.body.classList.add('is-birthday');
-      for (let i = 0; i < 5; i++) setTimeout(createConfetti, i * 200);
-      setInterval(() => createConfetti(), 300);
+      // 注意：updateCountdown 每秒都会进来一次，这里必须只启动一次，
+      // 否则每秒都会再挂一个 setInterval，彩带会越撒越猛直到卡死
+      if (!birthdayStarted) {
+        birthdayStarted = true;
+        for (let i = 0; i < 5; i++) setTimeout(createConfetti, i * 200);
+        setInterval(() => createConfetti(), 300);
+      }
       return;
     } else {
       // 非生日也撒一点彩带，保持氛围
