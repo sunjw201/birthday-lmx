@@ -30,7 +30,6 @@
       z-index: 0;
       pointer-events: none;
     }
-    .overlay > * { pointer-events: auto; }
 
     /* 可滚动内容 */
     .main-content {
@@ -58,6 +57,7 @@
       align-items: center;
       gap: 0.8rem;
       background: rgba(255, 255, 255, 0.08);
+      pointer-events: auto;
       border: 1px solid rgba(255, 107, 157, 0.35);
       border-radius: 50px;
       padding: 0.6rem 1rem 0.6rem 0.6rem;
@@ -1030,7 +1030,6 @@
 
   let musicOpen = false;
   let currentSong = 0;
-  let pendingPlay = false;
 
   // 隐藏提示
   setTimeout(() => { if (hint) hint.remove(); }, 4000);
@@ -1076,7 +1075,10 @@
     musicOpen = !musicOpen;
     if (musicOpen) {
       status.textContent = '加载中...';
-      if (bgMusic.readyState >= 3) {
+      if (!bgMusic.src || bgMusic.src === window.location.href) {
+        // 首次加载
+        loadSong(currentSong);
+      } else if (bgMusic.readyState >= 3) {
         bgMusic.play().then(() => {
           control.classList.add('playing');
           icon.textContent = '🎶';
