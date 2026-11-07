@@ -621,7 +621,26 @@
     .letter-header {
       text-align: center;
       margin-bottom: 1.5rem;
+      position: relative;
     }
+    #letterCloseBtn {
+      position: absolute;
+      top: -0.5rem;
+      right: -0.5rem;
+      background: rgba(200, 150, 100, 0.15);
+      border: 1.5px solid #e8d4b8;
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      font-size: 1rem;
+      color: #8B4513;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+    }
+    #letterCloseBtn:hover { background: rgba(200, 150, 100, 0.3); }
 
     .letter-emoji {
       font-size: 2.5rem;
@@ -950,6 +969,7 @@
 <!-- 💌 信件弹窗 -->
 <div class="letter-modal" id="letterModal">
   <div class="letter-header">
+    <button class="letter-close" id="letterCloseBtn" onclick="closeLetterModal()" title="关闭">✕</button>
     <span class="letter-emoji">💌</span>
     <div class="letter-title">给 LMX 的一封信</div>
     <div class="letter-date">From: 永远爱你的人</div>
@@ -1094,38 +1114,36 @@
   }
   setInterval(createHeart, 600);
 
-  // 🎤 飘动歌词 — 浪漫夸赞 · 甜蜜告白
+  // 🎤 飘动歌词 — 夸奖 LMX
   const LYRICS = [
     '你好漂亮啊 真的好好看',
     '你笑起来的样子真甜',
     '你的眼睛像星星一样闪亮',
-    '我好喜欢你',
-    '你是我见过最美的风景',
-    '心动的瞬间 都是因为你',
-    '你的温柔让我沦陷',
-    '想陪你走过每一个四季',
-    '你是上天给我最好的礼物',
-    '遇见你 是我最大的幸运',
-    '你是我心中唯一的宝贝',
+    '你是我见过最美的女孩',
+    '气质超好 让人移不开眼',
+    '温柔又可爱 真的好棒',
     '你让我的世界有了颜色',
-    '想一直这样看着你笑',
-    '你的每一次回眸 都让我心动',
-    '我愿意陪你到世界尽头',
-    '有你在 每天都值得期待',
-    '你让我的心跳漏了一拍',
-    '我好想你',
-    '愿所有美好 都为你而来',
-    '你值得 被全世界宠爱',
-    '我的眼里只有你',
-    '想跟你虚度时光',
-    '你是我藏不住的心动',
+    '有你在的地方都是晴天',
     '愿你永远天真 永远可爱',
-    '想牵着你的手 一直走下去',
-    '你让平凡的日常变得特别',
-    '我的女孩 生日快乐',
+    '你值得 被全世界宠爱',
     '愿你永远做自己的太阳',
-    '你是我不想醒来的梦',
-    '生日快乐 我的女孩',
+    '你真的好厉害 太棒啦',
+    '你笑起来全世界都亮了',
+    '愿所有美好 都为你而来',
+    '你让平凡的日常变得特别',
+    '温柔如水 美好如你',
+    '愿你永远闪闪发光',
+    '可爱的你 值得最好的',
+    '每天都元气满满 真好看',
+    '你好优秀 为你骄傲',
+    '愿你被世界温柔以待',
+    '甜甜的笑容 真好看',
+    '你真的好棒 超级厉害',
+    '愿你每天都开开心心',
+    '最美的祝福都给你',
+    '你真的好可爱',
+    '愿你永远幸福快乐',
+    '你是最棒的 相信你',
   ];
 
   let lyricIndex = 0;
@@ -1417,6 +1435,18 @@
       setTimeout(() => {
         document.getElementById('letterModal').classList.add('show');
       }, 200);
+    }, 300);
+  }
+
+  function closeLetterModal() {
+    document.getElementById('letterModal').classList.remove('show');
+    document.getElementById('modalOverlay').style.opacity = '0';
+    setTimeout(() => {
+      document.getElementById('modalOverlay').style.display = 'none';
+      const box = document.getElementById('giftBox');
+      box.style.transform = 'scale(1) rotate(0deg)';
+      box.style.opacity = '1';
+      box.style.transition = 'all 0.3s';
     }, 300);
   }
 
