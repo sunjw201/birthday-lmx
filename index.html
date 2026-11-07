@@ -866,7 +866,7 @@
 <div id="balloons"></div>
 
 <!-- 🎵 背景音乐 -->
-<audio id="bgMusic" loop preload="none">
+<audio id="bgMusic" loop preload="metadata">
   <source src="quiet-room.mp3" type="audio/mpeg">
 </audio>
 
@@ -1005,15 +1005,34 @@
   });
   bgMusic.addEventListener('ended', () => { progress.style.width = '0%'; });
 
+  let pendingPlay = false;
+
   control.addEventListener('click', () => {
     musicOpen = !musicOpen;
     if (musicOpen) {
-      bgMusic.play().catch(() => {});
-      control.classList.add('playing');
-      icon.textContent = '🎶';
-      status.textContent = '播放中';
+      status.textContent = '加载中...';
+      if (bgMusic.readyState >= 3) {
+        bgMusic.play().then(() => {
+          control.classList.add('playing');
+          icon.textContent = '🎶';
+          status.textContent = '播放中';
+        }).catch(err => { console.warn('play error:', err); status.textContent = '播放失败'; });
+      } else {
+        pendingPlay = true;
+        bgMusic.addEventListener('canplay', () => {
+          if (pendingPlay) {
+            bgMusic.play().then(() => {
+              control.classList.add('playing');
+              icon.textContent = '🎶';
+              status.textContent = '播放中';
+            }).catch(err => { console.warn('play error:', err); status.textContent = '播放失败'; });
+            pendingPlay = false;
+          }
+        }, { once: true });
+      }
     } else {
       bgMusic.pause();
+      pendingPlay = false;
       control.classList.remove('playing');
       icon.textContent = '🎵';
       status.textContent = '已暂停';
