@@ -871,7 +871,7 @@
     <span class="music-icon" id="musicIcon">🎵</span>
   </div>
   <div class="music-info">
-    <span class="music-title">Happy Birthday</span>
+    <span class="music-title">Quiet Room</span>
     <span class="music-status" id="musicStatus">点击播放</span>
   </div>
   <div class="music-waves" id="musicWaves">
@@ -889,18 +889,23 @@
   🎶 点击右上角播放背景音乐
 </div>
 
-<!-- 🔊 背景音乐（可替换为你的音乐URL） -->
-<!--
-  替换音乐方法：
-  1. 将音乐文件上传到 GitHub 仓库或使用网络音乐URL
-  2. 修改下面 src 的值为你的音乐链接
-  3. 推荐格式：MP3，文件小于 10MB 效果更好
--->
-<!--
-  想换歌？把 music.mp3 上传到仓库，然后改成 src="music/song.mp3"
--->
+<!-- 🔊 网易云音乐外链播放器（点击播放按钮时显示） -->
+<div id="musicOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:200;align-items:center;justify-content:center;" onclick="if(event.target===document.getElementById('musicOverlay'))closeMusic()">
+  <div style="background:white;border-radius:16px;padding:0;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.4);width:300px;">
+    <div style="background:linear-gradient(135deg,#ff6b9d,#ff8a80);padding:12px 16px;display:flex;justify-content:space-between;align-items:center;">
+      <span style="color:white;font-weight:bold;">Quiet Room 🎵</span>
+      <button onclick="closeMusic()" style="background:none;border:none;color:white;font-size:1.2rem;cursor:pointer;">✕</button>
+    </div>
+    <iframe id="musicIframe" frameborder="0" border="0" marginwidth="0" marginheight="0"
+      width="300" height="86"
+      src="https://music.163.com/outchain/player?id=3336111061&type=0"
+      style="display:block"></iframe>
+  </div>
+</div>
+
+<!-- 背景音频（备用） -->
 <audio id="bgMusic" loop preload="none">
-  <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+  <source src="" type="audio/mpeg">
 </audio>
 
 <!-- 🎆 烟花 Canvas -->
@@ -994,51 +999,40 @@
 </div>
 
 <script>
-  // 🎵 背景音乐控制
-  const audio = document.getElementById('bgMusic');
+  // 🎵 背景音乐控制（网易云音乐外链）
   const control = document.getElementById('musicControl');
   const icon = document.getElementById('musicIcon');
   const status = document.getElementById('musicStatus');
-  const progress = document.getElementById('musicProgress');
   const hint = document.getElementById('musicHint');
+  const musicOverlay = document.getElementById('musicOverlay');
 
-  let isPlaying = false;
+  let musicOpen = false;
 
   // 隐藏提示
   setTimeout(() => { if (hint) hint.remove(); }, 4000);
 
+  function openMusic() {
+    musicOverlay.style.display = 'flex';
+    musicOpen = true;
+    control.classList.add('playing');
+    icon.textContent = '🎶';
+    status.textContent = '播放中';
+  }
+
+  function closeMusic() {
+    musicOverlay.style.display = 'none';
+    musicOpen = false;
+    control.classList.remove('playing');
+    icon.textContent = '🎵';
+    status.textContent = '已暂停';
+  }
+
   control.addEventListener('click', () => {
-    if (isPlaying) {
-      audio.pause();
-      control.classList.remove('playing');
-      icon.textContent = '🎵';
-      status.textContent = '已暂停';
-      isPlaying = false;
+    if (musicOpen) {
+      closeMusic();
     } else {
-      const playPromise = audio.play();
-      if (playPromise !== undefined) {
-        playPromise.then(() => {
-          control.classList.add('playing');
-          icon.textContent = '🎶';
-          status.textContent = '播放中';
-          isPlaying = true;
-        }).catch(() => {
-          status.textContent = '点击重试';
-        });
-      }
+      openMusic();
     }
-  });
-
-  // 更新进度条
-  audio.addEventListener('timeupdate', () => {
-    if (audio.duration) {
-      const pct = (audio.currentTime / audio.duration) * 100;
-      progress.style.width = pct + '%';
-    }
-  });
-
-  audio.addEventListener('ended', () => {
-    progress.style.width = '0%';
   });
 
   // 🎈 创建气球
