@@ -962,14 +962,6 @@
 <div class="container">
   <div class="birthday-active">
     <h2 class="wish-title">🎊 生日快乐！🎊</h2>
-    <p class="wish-text">
-      亲爱的 LMX，今天是属于你的特别日子<br>
-      愿你永远被爱包围<br>
-      愿你永远闪闪发光 ✨<br>
-      愿你所有的期待都能如愿<br>
-      愿你被这世界温柔以待<br>
-      愿你的每一天都闪闪发光 ✨
-    </p>
   </div>
 
   <div id="birthday-normal">
@@ -983,7 +975,7 @@
       <span class="cake-hint">点击点蜡烛 ❤️</span>
     </div>
     <h1>Happy Birthday, LMX</h1>
-    <p class="date">11 月 07 日</p>
+    <p class="date">11 月 09 日</p>
     <div class="divider"></div>
 
     <p class="countdown-label">⏳ 距离生日还有</p>
@@ -1044,7 +1036,7 @@
   <div class="modal-emojis">🎂🎉🎁</div>
   <div class="modal-title">祝你生日快乐～</div>
   <div class="modal-name">🎀 LMX 🎀</div>
-  <div class="modal-sub">11 月 07 日 · 属于你的特别日子</div>
+  <div class="modal-sub">11 月 09 日 · 属于你的特别日子</div>
   <div class="modal-emojis">🎈🎊✨</div>
 </div>
 
@@ -1278,7 +1270,7 @@
   function getNextBirthday() {
     const now = new Date();
     let year = now.getFullYear();
-    const birthday = new Date(year, 10, 7); // 11月7日，月份从0开始（预览用，正式是 11月9日）
+    const birthday = new Date(year, 10, 9); // 11月9日，月份从0开始
     if (now > birthday) birthday.setFullYear(year + 1);
     return birthday;
   }
@@ -1290,7 +1282,7 @@
     const now = new Date();
     const diff = target - now;
 
-    const isBirthday = now.getMonth() === 10 && now.getDate() === 7;
+    const isBirthday = now.getMonth() === 10 && now.getDate() === 9;
 
     if (isBirthday) {
       document.body.classList.add('is-birthday');
