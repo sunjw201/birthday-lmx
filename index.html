@@ -189,6 +189,7 @@
       backdrop-filter: blur(10px);
       animation: hintPop 0.5s ease forwards, hintFade 0.5s 3s ease forwards;
       z-index: 99;
+      pointer-events: none;
     }
 
     @keyframes hintPop {
@@ -896,27 +897,31 @@
 <div class="overlay">
   <div class="particles" id="particles"></div>
   <div id="balloons"></div>
-  <audio id="bgMusic" loop preload="metadata"></audio>
-  <div class="music-control" id="musicControl" title="点击播放背景音乐">
-    <div class="music-icon-wrap">
-      <span class="music-icon" id="musicIcon">🎵</span>
-    </div>
-    <div class="music-info">
-      <span class="music-title">Quiet Room</span>
-      <span class="music-status" id="musicStatus">点击播放</span>
-    </div>
-    <div class="music-waves" id="musicWaves">
-      <div class="wave-bar" style="height:6px"></div>
-      <div class="wave-bar" style="height:10px"></div>
-      <div class="wave-bar" style="height:8px"></div>
-    </div>
-    <div class="music-progress">
-      <div class="music-progress-bar" id="musicProgress"></div>
-    </div>
-  </div>
-  <div class="music-hint" id="musicHint">🎶 点击右上角播放背景音乐</div>
   <canvas id="fireworks"></canvas>
 </div>
+
+<!-- 音乐控件必须放在 .overlay 外面：
+     .overlay 是 z-index:0 的独立层，里面的子元素再设 z-index 也压不过
+     z-index:1 的 .main-content，会被透明的主内容挡住点击 -->
+<audio id="bgMusic" loop preload="metadata"></audio>
+<div class="music-control" id="musicControl" title="点击播放背景音乐">
+  <div class="music-icon-wrap">
+    <span class="music-icon" id="musicIcon">🎵</span>
+  </div>
+  <div class="music-info">
+    <span class="music-title">Quiet Room</span>
+    <span class="music-status" id="musicStatus">点击播放</span>
+  </div>
+  <div class="music-waves" id="musicWaves">
+    <div class="wave-bar" style="height:6px"></div>
+    <div class="wave-bar" style="height:10px"></div>
+    <div class="wave-bar" style="height:8px"></div>
+  </div>
+  <div class="music-progress">
+    <div class="music-progress-bar" id="musicProgress"></div>
+  </div>
+</div>
+<div class="music-hint" id="musicHint">🎶 点击右上角播放背景音乐</div>
 
 <!-- 可滚动主内容 -->
 <div class="main-content">
@@ -1308,31 +1313,38 @@
     try {
       const ctx = new (window.AudioContext || window.webkitAudioContext)();
 
-      // 祝你生日快乐 简谱频率 (Hz)
-      // "祝 你 生 日 快 乐 ~"
+      // 祝你生日快乐 — F 大调，简谱 5 5 6 5 1' 7 | 5 5 6 5 2' 1' | 5 5 5' 3 1' 7 6 | 4 4 3 1 2 1
+      // 每句最后的长音对应句尾的"乐 ~"
       const melody = [
-        { freq: 264,  dur: 0.3 }, // C4 祝
-        { freq: 264,  dur: 0.15 }, // C4 你
-        { freq: 297,  dur: 0.45 }, // D4 生
-        { freq: 264,  dur: 0.45 }, // C4 日
-        { freq: 352,  dur: 0.45 }, // F4 快
-        { freq: 330,  dur: 0.9 },  // E4 乐
-        { freq: 264,  dur: 0.3 },  // C4 祝
-        { freq: 264,  dur: 0.15 }, // C4 你
-        { freq: 297,  dur: 0.45 }, // D4 生
-        { freq: 264,  dur: 0.45 }, // C4 日
-        { freq: 396,  dur: 0.45 }, // G4 了
-        { freq: 352,  dur: 0.9 },  // F4 ~ (很长)
-        { freq: 264,  dur: 0.3 },  // C4 祝
-        { freq: 264,  dur: 0.15 }, // C4 你
-        { freq: 440,  dur: 0.45 }, // A4 生
-        { freq: 352,  dur: 0.45 }, // F4 日
-        { freq: 330,  dur: 0.45 }, // E4 快
-        { freq: 297,  dur: 0.45 }, // D4 乐
-        { freq: 440,  dur: 0.6 },  // A4 祝你
-        { freq: 396,  dur: 0.6 },  // G4 生日
-        { freq: 352,  dur: 0.45 }, // F4 快
-        { freq: 330,  dur: 0.9 },  // E4 乐~
+        // 祝你生日快乐（第一句）
+        { freq: 261.63, dur: 0.3 }, // C4  祝
+        { freq: 261.63, dur: 0.3 }, // C4  你
+        { freq: 293.66, dur: 0.6 }, // D4  生
+        { freq: 261.63, dur: 0.6 }, // C4  日
+        { freq: 349.23, dur: 0.6 }, // F4  快
+        { freq: 329.63, dur: 1.2 }, // E4  乐
+        // 祝你生日快乐（第二句）
+        { freq: 261.63, dur: 0.3 }, // C4  祝
+        { freq: 261.63, dur: 0.3 }, // C4  你
+        { freq: 293.66, dur: 0.6 }, // D4  生
+        { freq: 261.63, dur: 0.6 }, // C4  日
+        { freq: 392.00, dur: 0.6 }, // G4  快
+        { freq: 349.23, dur: 1.2 }, // F4  乐
+        // 祝你生日快乐（第三句，要拔高到高音 C5）
+        { freq: 261.63, dur: 0.3 }, // C4  祝
+        { freq: 261.63, dur: 0.3 }, // C4  你
+        { freq: 523.25, dur: 0.6 }, // C5  生（高八度，整首歌的最高音）
+        { freq: 440.00, dur: 0.6 }, // A4  日
+        { freq: 349.23, dur: 0.6 }, // F4  快
+        { freq: 329.63, dur: 0.6 }, // E4  乐
+        { freq: 293.66, dur: 1.2 }, // D4  ~
+        // 祝你生日快乐（第四句，落在主音 F 上收尾）
+        { freq: 466.16, dur: 0.3 }, // Bb4 祝
+        { freq: 466.16, dur: 0.3 }, // Bb4 你
+        { freq: 440.00, dur: 0.6 }, // A4  生
+        { freq: 349.23, dur: 0.6 }, // F4  日
+        { freq: 392.00, dur: 0.6 }, // G4  快
+        { freq: 349.23, dur: 1.5 }, // F4  乐 ~
       ];
 
       let t = ctx.currentTime;
